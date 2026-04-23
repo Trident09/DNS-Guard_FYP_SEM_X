@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle, Info } from "lucide-react";
+import { AlertTriangle, CheckCircle } from "lucide-react";
 
 interface Report {
   threat_score: number;

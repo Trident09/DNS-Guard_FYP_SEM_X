@@ -93,7 +93,7 @@ export default function AnalyzePage() {
       .then((res) => setReport(res.data))
       .catch(() => setError("Analysis failed. Please try again."))
       .finally(() => setLoading(false));
-  }, [domain]);
+  }, [decodedDomain]);
 
   const copyDomain = () => {
     navigator.clipboard.writeText(decodedDomain);

@@ -1,4 +1,4 @@
-import { ShieldCheck, ShieldX, ShieldAlert } from "lucide-react";
+import { ShieldCheck, ShieldX } from "lucide-react";
 
 interface DnssecData {
   signed?: boolean;
