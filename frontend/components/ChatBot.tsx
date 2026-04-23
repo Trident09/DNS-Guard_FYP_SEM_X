@@ -24,7 +24,7 @@ export default function ChatBot({ domain }: { domain: string }) {
     setInput("");
     setLoading(true);
     try {
-      const res = await axios.post("/api/chat", { domain, intent, message: text });
+      const res = await axios.post("/api/chat", { domain, intent, message: text, history: messages });
       setMessages((m) => [...m, { role: "assistant", content: res.data.reply }]);
     } catch {
       setMessages((m) => [...m, { role: "assistant", content: "Sorry, something went wrong." }]);
