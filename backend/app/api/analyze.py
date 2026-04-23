@@ -10,6 +10,7 @@ from app.services.typosquat import get_typosquat
 from app.services.subdomain_enum import get_subdomains
 from app.services.reverse_ip import get_reverse_ip
 from app.services.threat_intel import get_threat_intel
+from app.services.geo_ip import get_geo
 from app.config import settings
 
 router = APIRouter()
@@ -34,13 +35,18 @@ async def analyze(req: AnalyzeRequest):
         get_reverse_ip(req.domain),
         get_threat_intel(req.domain),
     )
-    async with httpx.AsyncClient() as client:
-        ai_res = await client.post(
-            f"{settings.AI_SERVICE_URL}/score",
-            json={"domain": req.domain, "dns_data": dns_data},
-            timeout=30,
-        )
-    ai_result = ai_res.json()
+
+    # Collect IPs from A/AAAA records
+    ips = dns_data["records"].get("A", []) + dns_data["records"].get("AAAA", [])
+    if rev_ip_data.get("ip") and rev_ip_data["ip"] not in ips:
+        ips.insert(0, rev_ip_data["ip"])
+
+    geo_data, ai_res_raw = await asyncio.gather(
+        get_geo(ips),
+        _get_ai_score(req.domain, dns_data),
+    )
+    ai_result = ai_res_raw
+
     return {
         "domain": req.domain,
         "dns_records": dns_data["records"],
@@ -52,10 +58,21 @@ async def analyze(req: AnalyzeRequest):
         "subdomains": sub_data,
         "reverse_ip": rev_ip_data,
         "threat_intel": intel_data,
+        "geo": geo_data,
         "threat_score": ai_result["score"],
         "verdict": ai_result["verdict"],
         "explanations": ai_result["explanations"],
     }
+
+
+async def _get_ai_score(domain: str, dns_data: dict) -> dict:
+    async with httpx.AsyncClient() as client:
+        res = await client.post(
+            f"{settings.AI_SERVICE_URL}/score",
+            json={"domain": domain, "dns_data": dns_data},
+            timeout=30,
+        )
+    return res.json()
 
 
 @router.get("/whois/{domain}")

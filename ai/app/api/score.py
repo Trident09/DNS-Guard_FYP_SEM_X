@@ -32,18 +32,30 @@ def score(req: ScoreRequest):
 
     # Build plain-English explanations from top contributing features
     explanations = []
+    feature_importance = []
+
     for i, (name, val) in enumerate(zip(FEATURE_NAMES, features)):
         if val > 0 and name in REASON_MAP:
             impact = "high" if i in {8, 9, 10, 23, 35} else "medium" if i in {29, 30, 31, 33} else "low"
+            weight = {"high": 3, "medium": 2, "low": 1}[impact]
             explanations.append({
                 "feature": name,
                 "reason": REASON_MAP[name],
                 "impact": impact,
             })
+            feature_importance.append({
+                "feature": name.replace("_", " ").title(),
+                "value": round(val * weight * 10, 1),
+                "impact": impact,
+            })
+
+    # Sort by value descending, keep top 8
+    feature_importance.sort(key=lambda x: x["value"], reverse=True)
 
     return {
         "score": result["score"],
         "verdict": result["verdict"],
         "source": result["source"],
         "explanations": explanations,
+        "feature_importance": feature_importance[:8],
     }

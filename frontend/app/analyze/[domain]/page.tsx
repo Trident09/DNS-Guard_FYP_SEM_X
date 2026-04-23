@@ -16,6 +16,9 @@ import ReverseIpCard from "@/components/ReverseIpCard";
 import ThreatIntelCard from "@/components/ThreatIntelCard";
 import DnssecBadge from "@/components/DnssecBadge";
 import RiskSummary from "@/components/RiskSummary";
+import GeoMap from "@/components/GeoMap";
+import WhoisDiff from "@/components/WhoisDiff";
+import FeatureImportanceChart from "@/components/FeatureImportanceChart";
 import ChatBot from "@/components/ChatBot";
 
 interface Report {
@@ -76,6 +79,8 @@ interface Report {
     phishtank?: { listed: boolean; url?: string; target?: string };
   };
   explanations: { feature: string; reason: string; impact: "high" | "medium" | "low" }[];
+  feature_importance?: { feature: string; value: number; impact: "high" | "medium" | "low" }[];
+  geo?: { ip: string; country: string; country_code: string; city: string; lat: number; lon: number; org: string }[];
 }
 
 export default function AnalyzePage() {
@@ -180,6 +185,9 @@ export default function AnalyzePage() {
         <DnsRecordsTable records={report.dns_records} />
       </div>
 
+      {/* WHOIS diff */}
+      <WhoisDiff domain={decodedDomain} current={report.whois} />
+
       {/* Cert + Passive DNS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <CertCard data={report.certs} />
@@ -198,9 +206,17 @@ export default function AnalyzePage() {
         <ThreatIntelCard data={report.threat_intel} />
       </div>
 
-      {/* Explainability */}
-      <div className="mb-6">
+      {/* Geo Map */}
+      {report.geo && report.geo.length > 0 && (
+        <div className="mb-6">
+          <GeoMap points={report.geo} />
+        </div>
+      )}
+
+      {/* Explainability + Feature Importance */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <ExplainabilityPanel explanations={report.explanations} />
+        {report.feature_importance && <FeatureImportanceChart data={report.feature_importance} />}
       </div>
 
       {/* Chatbot */}
