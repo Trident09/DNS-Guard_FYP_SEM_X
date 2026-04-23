@@ -1,6 +1,6 @@
 "use client";
 
-import { Download } from "lucide-react";
+import { Download, Copy, Share2, Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
@@ -14,6 +14,8 @@ import TyposquatCard from "@/components/TyposquatCard";
 import SubdomainCard from "@/components/SubdomainCard";
 import ReverseIpCard from "@/components/ReverseIpCard";
 import ThreatIntelCard from "@/components/ThreatIntelCard";
+import DnssecBadge from "@/components/DnssecBadge";
+import RiskSummary from "@/components/RiskSummary";
 import ChatBot from "@/components/ChatBot";
 
 interface Report {
@@ -81,19 +83,38 @@ export default function AnalyzePage() {
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const decodedDomain = decodeURIComponent(domain);
 
   useEffect(() => {
     axios
-      .post("/api/analyze", { domain: decodeURIComponent(domain) })
+      .post("/api/analyze", { domain: decodedDomain })
       .then((res) => setReport(res.data))
       .catch(() => setError("Analysis failed. Please try again."))
       .finally(() => setLoading(false));
   }, [domain]);
 
+  const copyDomain = () => {
+    navigator.clipboard.writeText(decodedDomain);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const shareReport = () => {
+    if (navigator.share) {
+      navigator.share({ title: `DNS Guard — ${decodedDomain}`, url: window.location.href });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
-        <p className="animate-pulse text-lg">Analyzing {decodeURIComponent(domain)}…</p>
+        <p className="animate-pulse text-lg">Analyzing {decodedDomain}…</p>
       </div>
     );
 
@@ -108,29 +129,57 @@ export default function AnalyzePage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">
-          Report: <span className="text-blue-400">{decodeURIComponent(domain)}</span>
-        </h1>
-        <a
-          href={`/api/report/${encodeURIComponent(decodeURIComponent(domain))}/pdf`}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-medium transition-colors"
-        >
-          <Download className="w-4 h-4" />
-          Download PDF
-        </a>
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-2xl font-bold">
+            Report: <span className="text-blue-400">{decodedDomain}</span>
+          </h1>
+          <DnssecBadge data={report.dnssec} />
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={copyDomain}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors"
+            title="Copy domain"
+          >
+            {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+            Copy
+          </button>
+          <button
+            onClick={shareReport}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors"
+            title="Share report"
+          >
+            <Share2 className="w-4 h-4" />
+            Share
+          </button>
+          <a
+            href={`/api/report/${encodeURIComponent(decodedDomain)}/pdf`}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-medium transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Download PDF
+          </a>
+        </div>
       </div>
 
-      {/* Threat score — full width */}
+      {/* Threat score */}
       <div className="mb-6">
         <ThreatScoreCard score={report.threat_score} verdict={report.verdict} />
       </div>
 
-      {/* WHOIS + DNS records + Certs */}
+      {/* Risk Summary */}
+      <div className="mb-6">
+        <RiskSummary report={report} />
+      </div>
+
+      {/* WHOIS + DNS records */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <WhoisCard data={report.whois} />
         <DnsRecordsTable records={report.dns_records} />
       </div>
+
       {/* Cert + Passive DNS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <CertCard data={report.certs} />
@@ -155,7 +204,7 @@ export default function AnalyzePage() {
       </div>
 
       {/* Chatbot */}
-      <ChatBot domain={decodeURIComponent(domain)} />
+      <ChatBot domain={decodedDomain} />
     </div>
   );
 }

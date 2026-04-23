@@ -1,17 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Shield } from "lucide-react";
+import { Search, Shield, Clock, X } from "lucide-react";
+
+const STORAGE_KEY = "dns_guard_recent";
+const MAX_RECENT = 5;
 
 export default function Home() {
   const [domain, setDomain] = useState("");
+  const [recent, setRecent] = useState<string[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    try {
+      setRecent(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
+    } catch {}
+  }, []);
+
+  const navigate = (d: string) => {
+    const updated = [d, ...recent.filter((r) => r !== d)].slice(0, MAX_RECENT);
+    setRecent(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    router.push(`/analyze/${encodeURIComponent(d)}`);
+  };
+
+  const removeRecent = (d: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const updated = recent.filter((r) => r !== d);
+    setRecent(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!domain.trim()) return;
-    router.push(`/analyze/${encodeURIComponent(domain.trim())}`);
+    navigate(domain.trim());
   };
 
   return (
@@ -39,6 +63,29 @@ export default function Home() {
           Analyze
         </button>
       </form>
+
+      {recent.length > 0 && (
+        <div className="mt-8 w-full max-w-xl">
+          <p className="text-xs text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-1">
+            <Clock className="w-3 h-3" /> Recent searches
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {recent.map((r) => (
+              <button
+                key={r}
+                onClick={() => navigate(r)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm text-gray-300 transition-colors group"
+              >
+                {r}
+                <X
+                  className="w-3 h-3 text-gray-500 hover:text-white"
+                  onClick={(e) => removeRecent(r, e)}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
