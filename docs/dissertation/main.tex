@@ -303,7 +303,7 @@ The system performs multi-dimensional analysis of any given domain, extracting a
 
 Beyond scoring, DNS Guard integrates a suite of security intelligence modules including WHOIS analysis with change detection, Certificate Transparency log monitoring, passive DNS history with fast-flux detection, typosquatting detection against top global brands, subdomain enumeration, reverse IP lookup, and real-time blocklist checks via Spamhaus DBL and PhishTank. IP geolocation is visualised on an interactive SVG world map, and comprehensive PDF reports are generated for each scan.
 
-The platform further incorporates a context-aware AI chatbot powered by a local Ollama LLM (Mistral), with a rule-based fallback engine covering key DNS security topics. A Retrieval - Augmented Generation (RAG) pipeline backed by a Qdrant vector database enables the chatbot to provide accurate, domain-specific security guidance.
+The platform further incorporates a context-aware AI chatbot powered by a Groq API (LLaMA 3.1 8B Instant), with a rule-based fallback engine covering key DNS security topics. A Retrieval - Augmented Generation (RAG) pipeline backed by a Qdrant vector database enables the chatbot to provide accurate, domain-specific security guidance.
 
 The system is deployed as a containerised microservices architecture using Docker Compose, comprising a Next.js 14 frontend, a FastAPI backend with Celery task queuing, a dedicated AI/ML service, PostgreSQL for persistence, and Redis as the message broker. Evaluation demonstrates that DNS Guard effectively identifies malicious, misconfigured, and suspicious domains with high accuracy, offering a practical and extensible tool for DNS security monitoring and threat intelligence.
 
@@ -552,7 +552,7 @@ The technologies required to build DNS Guard are all mature, well-documented, an
 
 The use of Docker and Docker Compose \cite{docker2024} makes it straightforward to package all components of the system into containers that can be run on any machine. PostgreSQL \cite{postgresql2024} and Redis \cite{redis2024} are both widely used and reliable choices for data storage and task queuing respectively. Qdrant \cite{qdrant2024} is a purpose-built vector database that is well suited for the RAG pipeline used by the chatbot.
 
-Ollama \cite{ollama2024} provides a simple way to run open-source LLMs locally, which avoids the cost and privacy concerns of using cloud-based AI services. The Mistral model \cite{jiang2023mistral} is a capable open-source LLM that runs well on consumer hardware.
+Groq \cite{groq2024} provides a cloud-based LLM inference API with a generous free tier, offering extremely fast responses using the LPU architecture. The LLaMA 3.1 8B Instant model is a capable open-source model that delivers high-quality responses with low latency.
 
 Overall, the technical feasibility of the project is high. All required components are available, well-supported, and have been used successfully in similar projects.
 
@@ -602,9 +602,9 @@ An alternative would have been to use plain React with a separate Express.js ser
 
 \textbf{ReportLab} \cite{reportlab2024} is a Python library for generating PDF documents programmatically. It was used to create the downloadable PDF reports in DNS Guard. ReportLab was chosen because it gives full control over the layout and content of the PDF, including tables, charts, and formatted text. An alternative would have been to use a headless browser to render an HTML page as a PDF, but this approach is heavier and slower. ReportLab produces PDFs directly from Python code, which is faster and more suitable for a server-side API.
 
-\subsection{AI and LLM: Ollama and Mistral}
+\subsection{AI and LLM: Groq API}
 
-\textbf{Ollama} \cite{ollama2024} is a tool that makes it easy to run open-source large language models locally on a personal computer or server. It was used in DNS Guard to run the \textbf{Mistral 7B} model \cite{jiang2023mistral}, which powers the AI chatbot. Running the LLM locally has several advantages over using a cloud-based API such as OpenAI. It is free to use, does not send user data to a third party, and does not require an internet connection once the model is downloaded. Mistral 7B was chosen because it is one of the best-performing open-source models of its size, offering a good balance between response quality and the hardware resources required to run it \cite{jiang2023mistral}. A rule-based fallback engine was also implemented for cases where Ollama is not available.
+\textbf{Groq API} \cite{groq2024} is a cloud-based LLM inference service that provides extremely fast responses using the LPU (Language Processing Unit) architecture. It was used in DNS Guard to power the AI chatbot using the \textbf{LLaMA 3.1 8B Instant} model. Groq offers a free tier with generous rate limits, making it suitable for academic projects. The API is OpenAI-compatible, which simplifies integration. A rule-based fallback engine was also implemented for cases where the Groq API is unavailable or the API key is not configured.
 
 \subsection{Containerisation: Docker and Docker Compose}
 
@@ -1040,7 +1040,7 @@ The development went through the following increments:
     \item \textbf{Increment 2 -- DNS and WHOIS Analysis:} Implemented DNS record resolution using dnspython, DNSSEC validation, and WHOIS lookup. Added the results display on the frontend.
     \item \textbf{Increment 3 -- Threat Intelligence Modules:} Added certificate transparency querying, passive DNS history, typosquatting detection, subdomain enumeration, reverse IP lookup, and blocklist checks.
     \item \textbf{Increment 4 -- Machine Learning:} Built the feature extractor, trained the Random Forest and MLP ensemble model, and integrated the AI service with the backend.
-    \item \textbf{Increment 5 -- AI Chatbot:} Set up the Qdrant vector database, built the RAG pipeline, and integrated the Ollama LLM with a rule-based fallback.
+    \item \textbf{Increment 5 -- AI Chatbot:} Set up the Qdrant vector database, built the RAG pipeline, and integrated the Groq API (LLaMA 3.1) with a rule-based fallback.
     \item \textbf{Increment 6 -- Reporting and Polish:} Added PDF report generation, the geolocation map, WHOIS diff detection, dark/light mode, and recent search history.
 \end{enumerate}
 
@@ -1050,7 +1050,7 @@ This incremental approach meant that a working version of the system was availab
 
 During the development of DNS Guard, \textbf{evolutionary prototyping} was used alongside the incremental model. In evolutionary prototyping, the prototype is not thrown away after gathering feedback. Instead, it is continuously refined and improved until it becomes the final product. This was appropriate for this project because the requirements for some features, such as the threat scoring model and the chatbot, were not fully defined at the start and evolved as the project progressed.
 
-For example, the initial version of the threat scoring model used only lexical features. After testing, it became clear that DNS record features and DNSSEC status were also important, so the feature set was expanded from 12 to 40 features. Similarly, the chatbot started as a simple keyword-matching rule engine and was later upgraded to use a full RAG pipeline with a local LLM.
+For example, the initial version of the threat scoring model used only lexical features. After testing, it became clear that DNS record features and DNSSEC status were also important, so the feature set was expanded from 12 to 40 features. Similarly, the chatbot started as a simple keyword-matching rule engine and was later upgraded to use the Groq API (LLaMA 3.1 8B Instant) for natural language responses.
 
 \section{Coding Standard}
 
@@ -1118,7 +1118,7 @@ Code Editor & Visual Studio Code \\
 \hline
 Version Control & Git with GitHub \\
 \hline
-LLM (Optional) & Ollama with Mistral 7B \\
+LLM (Optional) & Groq API (LLaMA 3.1 8B Instant) \\
 \hline
 \end{longtable}
 
@@ -1162,7 +1162,7 @@ dnspython & 2.x & DNS record resolution \\
 \hline
 ReportLab & 4.x & PDF report generation \\
 \hline
-Ollama & Latest & Local LLM runtime \\
+Groq API & Cloud & Fast LLM inference (free tier) \\
 \hline
 Docker Compose & 2.x & Service orchestration \\
 \hline
@@ -1224,9 +1224,9 @@ DNS Guard offers several advantages over existing tools and brings a number of u
 
 \textbf{WHOIS change detection:} The system stores WHOIS data from every scan and compares it against the previous scan for the same domain. If any registration details have changed, such as the registrar, name servers, or contact information, the system highlights the differences. This is useful for detecting domain hijacking or unauthorised transfers.
 
-\textbf{AI chatbot with RAG:} The built-in chatbot uses a local LLM (Mistral via Ollama) combined with a Retrieval-Augmented Generation pipeline backed by Qdrant. This means the chatbot can answer questions about DNS security using a curated knowledge base, rather than relying purely on the model's training data. A rule-based fallback engine ensures the chatbot remains useful even when Ollama is not running.
+\textbf{AI chatbot powered by Groq:} The built-in chatbot uses the Groq API (LLaMA 3.1 8B Instant) to provide natural language responses to DNS security questions. The API is called with a context-aware system prompt based on the user's intent and the domain being analysed. A rule-based fallback engine ensures the chatbot remains useful even when the Groq API is unavailable.
 
-\textbf{Privacy-first design:} Because the LLM runs locally using Ollama, no user data is sent to any external AI service. This is an important advantage for users who are analysing sensitive or internal domains.
+\textbf{Free tier API:} The chatbot uses the Groq API free tier, which provides fast LLM inference without cost. The API key is optional; if not configured, the system falls back to a comprehensive rule-based engine that covers all major DNS security topics.
 
 \textbf{Free and open deployment:} The entire system runs on Docker Compose and can be started with a single command. All core functionality works without any paid API keys, making it accessible to students, researchers, and small organisations.
 
@@ -1248,7 +1248,7 @@ The system was tested by analysing a range of domains across different risk cate
 
 \textbf{Passive DNS and fast-flux detection:} For domains with available passive DNS data, the system correctly identified fast-flux behaviour in domains that had resolved to a large number of different IP addresses over a short period.
 
-\textbf{Chatbot performance:} When Ollama was running, the chatbot provided accurate and contextually relevant answers to questions about DNS security topics. The RAG pipeline ensured that answers were grounded in the knowledge base rather than being generated purely from the model's memory. The rule-based fallback also handled common questions correctly when Ollama was not available.
+\textbf{Chatbot performance:} When the Groq API key was configured, the chatbot provided accurate and contextually relevant answers to questions about DNS security topics. Responses were generated in under one second due to Groq's LPU inference speed. The rule-based fallback also handled common questions correctly when the API was not available.
 
 \textbf{Performance:} A typical full domain analysis completed in approximately 8 to 15 seconds, depending on the responsiveness of external services such as WHOIS servers and crt.sh. The asynchronous Celery architecture ensured that the API remained responsive during analysis and that multiple domains could be analysed concurrently.
 
@@ -1286,7 +1286,7 @@ The system successfully meets all the objectives defined at the start of the pro
 
 The machine learning component of the project produced a working threat scoring model that uses a 40-feature vector and an ensemble of a Random Forest classifier and an MLP neural network. The model assigns a risk score between 0 and 100 to any domain and explains which features contributed most to the score using a SHAP-style feature importance chart. This level of explainability is important because it allows users to understand why a domain was flagged and what they can do about it.
 
-The AI chatbot, powered by a local Ollama LLM with a RAG pipeline backed by Qdrant, provides a conversational interface for asking questions about DNS security and about the results of a scan. Running the LLM locally means that no user data is sent to any external service, which is an important consideration for privacy.
+The AI chatbot, powered by a Groq API (LLaMA 3.1) with a rule-based fallback engine, provides a conversational interface for asking questions about DNS security and about the results of a scan. Running the LLM locally means that no user data is sent to any external service, which is an important consideration for privacy.
 
 The system is built as a set of containerised microservices using Docker Compose, which makes it easy to deploy and run on any machine with a single command. The use of FastAPI, Celery, PostgreSQL, and Redis provides a solid and scalable foundation that could support a much larger number of users with relatively minor changes.
 
@@ -1571,9 +1571,9 @@ All environment variables are defined in the \texttt{.env} file at the root of t
 \hline
 \texttt{AI\_SERVICE\_URL} & \texttt{http://ai:8001} & Internal URL of the AI/ML service. \\
 \hline
-\texttt{OLLAMA\_BASE\_URL} & \texttt{http://host.docker. internal:11434} & URL of the Ollama LLM on the host machine. \\
+\texttt{GROQ\_API\_KEY} & (empty) & Groq API key for the AI chatbot. Get a free key at \url{https://console.groq.com}. \\
 \hline
-\texttt{OLLAMA\_MODEL} & \texttt{mistral} & Ollama model name for the chatbot. \\
+\texttt{LLM\_MODEL} & \texttt{llama-3.1-8b-instant} & Groq model name for the chatbot. \\
 \hline
 \texttt{VIRUSTOTAL\_API\_KEY} & (empty) & Optional VirusTotal API key. \\
 \hline
@@ -1596,7 +1596,7 @@ All environment variables are defined in the \texttt{.env} file at the root of t
 \begin{itemize}
     \item \textbf{Docker Desktop} (v4.0+) -- \url{https://www.docker.com/products/docker-desktop}
     \item \textbf{Git} -- \url{https://git-scm.com}
-    \item (Optional) \textbf{Ollama} -- \url{https://ollama.com}
+    \item (Optional) \textbf{Groq API Key} -- \url{https://console.groq.com} (free tier available)
 \end{itemize}
 
 \section*{E.2 Installation Steps}
@@ -1613,11 +1613,13 @@ cp .env.example .env
 \end{verbatim}
 Open \texttt{.env} and change \texttt{POSTGRES\_PASSWORD} and \texttt{SECRET\_KEY} for any non-development use.
 
-\textbf{Step 3: (Optional) Set up Ollama}
+\textbf{Step 3: (Optional) Configure Groq API for AI chatbot}
+
+Sign up at \url{https://console.groq.com} and create a free API key. Add it to \texttt{.env}:
 \begin{verbatim}
-ollama pull mistral
+GROQ_API_KEY=gsk_your_key_here
 \end{verbatim}
-Ollama must be running on the host machine before starting Docker.
+If no key is provided, the chatbot will use the built-in rule-based fallback engine.
 
 \textbf{Step 4: Build and start all services}
 \begin{verbatim}
@@ -1710,7 +1712,7 @@ The following pages contain a sample PDF report generated by DNS Guard for the d
 
   \item Qdrant, ``Vector Database for the Next Generation of AI Applications.'' [Online]. Available: \url{https://qdrant.tech}
 
-  \item Ollama, ``Get Up and Running with Large Language Models Locally.'' [Online]. Available: \url{https://ollama.com}
+  \item Groq Inc., ``Groq API -- Fast AI Inference.'' [Online]. Available: \url{https://console.groq.com}
 
   \item B. Halley and B. Westenberg, ``dnspython -- A DNS Toolkit for Python.'' [Online]. Available: \url{https://www.dnspython.org}
 
