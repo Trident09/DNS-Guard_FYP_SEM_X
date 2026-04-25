@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNS Guard — FYP Presentation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --card: #1a2235;
+    --accent: #3b82f6;
+    --accent2: #06b6d4;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --border: #1e293b;
+  }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--text); }
+
+  /* Slide container */
+  #deck { width: 100vw; height: 100vh; position: relative; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 60px 80px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateX(40px);
+  }
+  .slide.active { opacity: 1; pointer-events: all; transform: translateX(0); }
+  .slide.exit { opacity: 0; transform: translateX(-40px); }
+
+  /* Nav */
+  #nav {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 16px; z-index: 100;
+    background: rgba(17,24,39,0.85); backdrop-filter: blur(8px);
+    border: 1px solid var(--border); border-radius: 50px; padding: 10px 24px;
+  }
+  #nav button {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 18px; padding: 4px 10px; border-radius: 6px; transition: color 0.2s, background 0.2s;
+  }
+  #nav button:hover { color: var(--text); background: var(--card); }
+  #nav button:disabled { opacity: 0.3; cursor: default; }
+  #counter { color: var(--muted); font-size: 13px; min-width: 60px; text-align: center; }
+  .dot-row { display: flex; gap: 6px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s, transform 0.2s; }
+  .dot.on { background: var(--accent); transform: scale(1.3); }
+
+  /* Keyboard hint */
+  #hint { position: fixed; top: 20px; right: 24px; font-size: 11px; color: var(--muted); opacity: 0.6; }
+
+  /* Typography helpers */
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--accent2); margin-bottom: 14px;
+  }
+  h1 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; line-height: 1.15; }
+  h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 700; margin-bottom: 28px; }
+  h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; }
+  p, li { font-size: clamp(0.85rem, 1.3vw, 1rem); line-height: 1.7; color: var(--muted); }
+  ul { list-style: none; }
+  ul li::before { content: "→ "; color: var(--accent); font-weight: 700; }
+  .accent { color: var(--accent); }
+  .accent2 { color: var(--accent2); }
+  .green { color: var(--green); }
+
+  /* Grid helpers */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
+
+  /* Card */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px;
+  }
+  .card.accent-border { border-color: var(--accent); }
+
+  /* Badge */
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; background: rgba(59,130,246,0.15); color: var(--accent);
+    border: 1px solid rgba(59,130,246,0.3);
+  }
+
+  /* Divider */
+  .divider { width: 60px; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; margin: 16px 0 28px; }
+
+  /* Slide-specific */
+  /* 1 — Title */
+  #s1 { background: radial-gradient(ellipse at 30% 40%, rgba(59,130,246,0.12) 0%, transparent 60%), radial-gradient(ellipse at 70% 70%, rgba(6,182,212,0.08) 0%, transparent 55%), var(--bg); }
+  #s1 .logo { font-size: 3.5rem; margin-bottom: 8px; }
+  #s1 h1 span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  #s1 .meta { margin-top: 32px; display: flex; gap: 32px; }
+  #s1 .meta-item { text-align: center; }
+  #s1 .meta-item .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  #s1 .meta-item .value { font-size: 14px; color: var(--text); margin-top: 4px; }
+  #s1 .pill-row { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; justify-content: center; }
+  #s1 .pill { padding: 5px 14px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border); color: var(--muted); }
+
+  /* 2 — Outline */
+  #s2 .outline-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; margin-top: 8px; }
+  #s2 .outline-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; align-items: flex-start; gap: 14px; }
+  #s2 .outline-item .num { font-size: 1.6rem; font-weight: 800; color: var(--accent); opacity: 0.4; line-height: 1; }
+  #s2 .outline-item .title { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+  #s2 .outline-item .sub { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+  /* 3 — Problem */
+  #s3 { background: radial-gradient(ellipse at 80% 20%, rgba(239,68,68,0.07) 0%, transparent 50%), var(--bg); }
+  #s3 .stat-row { display: flex; gap: 20px; width: 100%; margin-bottom: 24px; }
+  #s3 .stat { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+  #s3 .stat .num { font-size: 2rem; font-weight: 800; color: var(--red); }
+  #s3 .stat .label { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+  /* 4 — Aims */
+  #s4 .aim-list { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+  #s4 .aim { display: flex; align-items: flex-start; gap: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; }
+  #s4 .aim .icon { font-size: 1.4rem; flex-shrink: 0; }
+  #s4 .aim h3 { color: var(--text); margin-bottom: 4px; }
+  #s4 .aim p { font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div id="hint">← → Arrow keys to navigate</div>
+
+<div id="deck">
+
+  <!-- SLIDE 1: Title -->
+  <section class="slide active" id="s1">
+    <div class="logo">🛡️</div>
+    <div class="tag">Final Year Project — 2026</div>
+    <h1><span>DNS Guard</span></h1>
+    <p style="max-width:560px;text-align:center;margin-top:12px;font-size:1.05rem;">
+      A Domain Threat Intelligence Platform for detecting DNS abuse, misconfigurations, phishing, and security threats using ML.
+    </p>
+    <div class="meta">
+      <div class="meta-item"><div class="label">Presented by</div><div class="value">Rupam Barui</div></div>
+      <div class="meta-item"><div class="label">Degree</div><div class="value">B.Tech — Computer Science</div></div>
+      <div class="meta-item"><div class="label">Year</div><div class="value">2025–26</div></div>
+    </div>
+    <div class="pill-row">
+      <span class="pill">Next.js 14</span>
+      <span class="pill">FastAPI</span>
+      <span class="pill">Machine Learning</span>
+      <span class="pill">Docker</span>
+      <span class="pill">PostgreSQL</span>
+      <span class="pill">Redis</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: Outline -->
+  <section class="slide" id="s2">
+    <div class="tag">Presentation Structure</div>
+    <h2>Outline</h2>
+    <div class="outline-grid">
+      <div class="outline-item"><div class="num">01</div><div><div class="title">Problem Summary</div><div class="sub">DNS abuse landscape & gaps</div></div></div>
+      <div class="outline-item"><div class="num">02</div><div><div class="title">Aims & Objectives</div><div class="sub">Goals and success criteria</div></div></div>
+      <div class="outline-item"><div class="num">03</div><div><div class="title">Architecture</div><div class="sub">System design & data flow</div></div></div>
+      <div class="outline-item"><div class="num">04</div><div><div class="title">Logic & ML Model</div><div class="sub">Feature extraction & scoring</div></div></div>
+      <div class="outline-item"><div class="num">05</div><div><div class="title">Implementation Stack</div><div class="sub">Technologies & services</div></div></div>
+      <div class="outline-item"><div class="num">06</div><div><div class="title">Results</div><div class="sub">Features, accuracy & demo</div></div></div>
+      <div class="outline-item"><div class="num">07</div><div><div class="title">Conclusion</div><div class="sub">Summary & future work</div></div></div>
+      <div class="outline-item"><div class="num">08</div><div><div class="title">References</div><div class="sub">Sources & citations</div></div></div>
+      <div class="outline-item"><div class="num">09</div><div><div class="title">Thank You</div><div class="sub">Q&amp;A</div></div></div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: Problem Summary -->
+  <section class="slide" id="s3">
+    <div class="tag">Motivation</div>
+    <h2>Problem Summary</h2>
+    <div class="stat-row">
+      <div class="stat"><div class="num">3.4B</div><div class="label">Phishing emails sent daily</div></div>
+      <div class="stat"><div class="num">1.5M</div><div class="label">New phishing sites per month</div></div>
+      <div class="stat"><div class="num">72%</div><div class="label">Attacks use DNS as attack vector</div></div>
+      <div class="stat"><div class="num">24h+</div><div class="label">Average detection delay</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>🔴 The Problem</h3>
+        <ul style="margin-top:10px;">
+          <li>DNS is critical infrastructure but largely unmonitored</li>
+          <li>Phishing &amp; typosquatting domains proliferate rapidly</li>
+          <li>DNSSEC adoption remains low (&lt;20% of domains)</li>
+          <li>No unified tool for holistic DNS threat analysis</li>
+          <li>Existing tools are fragmented, expensive, or CLI-only</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🟡 The Gap</h3>
+        <ul style="margin-top:10px;">
+          <li>Security teams lack real-time domain risk scoring</li>
+          <li>No explainable ML model for DNS threat detection</li>
+          <li>WHOIS change detection is rarely automated</li>
+          <li>Certificate Transparency spike alerts are uncommon</li>
+          <li>No integrated AI assistant for DNS guidance</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: Aims & Objectives -->
+  <section class="slide" id="s4">
+    <div class="tag">Goals</div>
+    <h2>Aims &amp; Objectives</h2>
+    <div class="aim-list">
+      <div class="aim"><div class="icon">🎯</div><div><h3>Unified Threat Intelligence Platform</h3><p>Build a single web application that aggregates DNS, WHOIS, certificate, passive DNS, and threat feed data for any domain.</p></div></div>
+      <div class="aim"><div class="icon">🤖</div><div><h3>ML-Based Threat Scoring</h3><p>Train an ensemble model on 40 lexical, DNS, and DNSSEC features to produce an explainable 0–100 risk score with SHAP-style feature importance.</p></div></div>
+      <div class="aim"><div class="icon">🔍</div><div><h3>Automated Abuse Detection</h3><p>Detect typosquatting, fast-flux DNS, subdomain takeover risks, certificate spikes, and WHOIS anomalies automatically.</p></div></div>
+      <div class="aim"><div class="icon">💬</div><div><h3>AI-Powered Security Assistant</h3><p>Provide a context-aware chatbot (Groq LLM) that answers DNS security questions and guides users through remediation steps.</p></div></div>
+    </div>
+  </section>
+
+
+  <!-- SLIDE 5: Architecture -->
+  <section class="slide" id="s5">
+    <div class="tag">System Design</div>
+    <h2>Architecture</h2>
+    <div class="grid2" style="align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card accent-border">
+          <h3>🌐 Frontend — Port 3000</h3>
+          <p style="margin-top:6px;">Next.js 14 App Router · Tailwind CSS · Recharts · Lucide icons. Proxies all API calls to backend.</p>
+        </div>
+        <div class="card">
+          <h3>⚙️ Backend — Port 8000</h3>
+          <p style="margin-top:6px;">FastAPI · Celery workers · ReportLab PDF. Orchestrates all analysis services and stores results in PostgreSQL.</p>
+        </div>
+        <div class="card">
+          <h3>🤖 AI Service — Port 8001</h3>
+          <p style="margin-top:6px;">FastAPI · scikit-learn ensemble · Groq LLM API. Handles threat scoring and chatbot responses.</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card">
+          <h3>🗄️ Data Layer</h3>
+          <ul style="margin-top:8px;">
+            <li><span class="accent">PostgreSQL</span> — persistent scan storage</li>
+            <li><span class="accent2">Redis</span> — Celery task queue &amp; broker</li>
+            <li><span class="green">Qdrant</span> — vector DB for RAG chatbot</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🔗 External APIs</h3>
+          <ul style="margin-top:8px;">
+            <li>crt.sh — Certificate Transparency</li>
+            <li>ip-api.com — IP Geolocation</li>
+            <li>Spamhaus DBL + PhishTank</li>
+            <li>VirusTotal &amp; Shodan (optional)</li>
+          </ul>
+        </div>
+        <div class="card" style="background:rgba(59,130,246,0.06);">
+          <h3>📦 Deployment</h3>
+          <p style="margin-top:6px;">All 7 services containerised with Docker Compose. Single <code style="color:var(--accent2);font-size:0.85em;">docker compose up --build</code> to run.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: Logic & ML -->
+  <section class="slide" id="s6">
+    <div class="tag">Intelligence Layer</div>
+    <h2>Logic &amp; ML Model</h2>
+    <div class="grid2" style="align-items:start;">
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <h3>40-Feature Vector</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+            <span class="badge">Entropy</span><span class="badge">Domain Length</span><span class="badge">Digit Ratio</span>
+            <span class="badge">Brand Keywords</span><span class="badge">Phishing Keywords</span><span class="badge">TLD Risk</span>
+            <span class="badge">A / MX / NS / TXT</span><span class="badge">SPF / DKIM / DMARC</span>
+            <span class="badge">Fast-Flux Indicators</span><span class="badge">DNSKEY / RRSIG / DS</span>
+            <span class="badge">MX without SPF</span><span class="badge">Brand in Subdomain</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Ensemble Model</h3>
+          <ul style="margin-top:10px;">
+            <li>Rule-based scoring (weighted heuristics)</li>
+            <li>MLP Neural Network (scikit-learn)</li>
+            <li>Outputs 0–100 risk score</li>
+            <li>SHAP-style feature importance returned per scan</li>
+          </ul>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card">
+          <h3>Analysis Pipeline</h3>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:10px;"><span style="background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</span><span style="font-size:0.85rem;color:var(--muted);">Domain submitted → Celery task queued</span></div>
+            <div style="display:flex;align-items:center;gap:10px;"><span style="background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</span><span style="font-size:0.85rem;color:var(--muted);">Parallel: DNS, WHOIS, CT, Passive DNS, Geo, Threat Intel</span></div>
+            <div style="display:flex;align-items:center;gap:10px;"><span style="background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</span><span style="font-size:0.85rem;color:var(--muted);">Feature vector extracted from aggregated data</span></div>
+            <div style="display:flex;align-items:center;gap:10px;"><span style="background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">4</span><span style="font-size:0.85rem;color:var(--muted);">Ensemble model scores domain 0–100</span></div>
+            <div style="display:flex;align-items:center;gap:10px;"><span style="background:var(--green);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">5</span><span style="font-size:0.85rem;color:var(--muted);">Results stored, PDF generated, UI rendered</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Detection Capabilities</h3>
+          <ul style="margin-top:10px;">
+            <li>Typosquatting via edit-distance matching</li>
+            <li>Fast-flux via IP change frequency</li>
+            <li>WHOIS diff between scans</li>
+            <li>CT log spike detection</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: Implementation Stack -->
+  <section class="slide" id="s7">
+    <div class="tag">Technologies</div>
+    <h2>Implementation Stack</h2>
+    <div class="grid3">
+      <div class="card">
+        <h3>🖥️ Frontend</h3>
+        <ul style="margin-top:10px;">
+          <li>Next.js 14 (App Router)</li>
+          <li>Tailwind CSS</li>
+          <li>Recharts (data viz)</li>
+          <li>Lucide Icons</li>
+          <li>Axios</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>⚙️ Backend</h3>
+        <ul style="margin-top:10px;">
+          <li>FastAPI (Python 3.11)</li>
+          <li>Celery + Redis</li>
+          <li>SQLAlchemy + PostgreSQL</li>
+          <li>ReportLab (PDF)</li>
+          <li>httpx, dnspython</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🤖 AI / ML</h3>
+        <ul style="margin-top:10px;">
+          <li>scikit-learn (MLP + RF)</li>
+          <li>Groq API (LLaMA 3.1)</li>
+          <li>Qdrant (vector DB)</li>
+          <li>numpy, pydantic</li>
+          <li>RAG pipeline</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🗄️ Data &amp; Infra</h3>
+        <ul style="margin-top:10px;">
+          <li>PostgreSQL 16</li>
+          <li>Redis 7</li>
+          <li>Qdrant vector store</li>
+          <li>Docker Compose</li>
+          <li>Python-dotenv config</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🔗 External Services</h3>
+        <ul style="margin-top:10px;">
+          <li>crt.sh (CT logs)</li>
+          <li>ip-api.com (Geo)</li>
+          <li>Spamhaus DBL</li>
+          <li>PhishTank</li>
+          <li>VirusTotal / Shodan</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🛠️ Dev Tools</h3>
+        <ul style="margin-top:10px;">
+          <li>Git + GitHub</li>
+          <li>Docker Desktop</li>
+          <li>VS Code / Kiro</li>
+          <li>Postman (API testing)</li>
+          <li>ESLint + TypeScript</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: Results -->
+  <section class="slide" id="s8">
+    <div class="tag">Outcomes</div>
+    <h2>Results</h2>
+    <div class="grid2" style="align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card">
+          <h3>✅ Features Delivered</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+            <span class="badge">Threat Score (0–100)</span>
+            <span class="badge">DNSSEC Validation</span>
+            <span class="badge">WHOIS Analysis</span>
+            <span class="badge">WHOIS Diff</span>
+            <span class="badge">Certificate Transparency</span>
+            <span class="badge">Passive DNS</span>
+            <span class="badge">Typosquat Detection</span>
+            <span class="badge">Subdomain Enumeration</span>
+            <span class="badge">Reverse IP</span>
+            <span class="badge">Threat Intel</span>
+            <span class="badge">Geo IP Map</span>
+            <span class="badge">Feature Importance</span>
+            <span class="badge">PDF Report</span>
+            <span class="badge">AI Chatbot</span>
+            <span class="badge">Dark / Light Mode</span>
+            <span class="badge">Recent Searches</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>📊 Model Performance</h3>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
+            <div><div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px;"><span style="color:var(--muted);">Accuracy</span><span class="green">~92%</span></div><div style="height:6px;background:var(--border);border-radius:3px;"><div style="width:92%;height:100%;background:var(--green);border-radius:3px;"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px;"><span style="color:var(--muted);">Precision</span><span class="accent">~89%</span></div><div style="height:6px;background:var(--border);border-radius:3px;"><div style="width:89%;height:100%;background:var(--accent);border-radius:3px;"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px;"><span style="color:var(--muted);">Recall</span><span class="accent2">~91%</span></div><div style="height:6px;background:var(--border);border-radius:3px;"><div style="width:91%;height:100%;background:var(--accent2);border-radius:3px;"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card">
+          <h3>🚀 System Performance</h3>
+          <ul style="margin-top:10px;">
+            <li>Full domain scan completes in ~3–5 seconds</li>
+            <li>Async Celery workers for parallel data collection</li>
+            <li>PDF report generated in &lt;1 second</li>
+            <li>Chatbot response via Groq API in &lt;1 second</li>
+            <li>All services containerised, single-command deploy</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🎯 Key Achievements</h3>
+          <ul style="margin-top:10px;">
+            <li>17 distinct analysis modules integrated</li>
+            <li>40-feature ML vector with explainability</li>
+            <li>Real-time WHOIS change detection</li>
+            <li>Context-aware AI assistant with LLM fallback</li>
+            <li>Fully responsive dark/light UI</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: Conclusion & Future Work -->
+  <section class="slide" id="s9">
+    <div class="tag">Summary</div>
+    <h2>Conclusion &amp; Future Work</h2>
+    <div class="grid2" style="align-items:start;">
+      <div class="card">
+        <h3>✅ Conclusion</h3>
+        <ul style="margin-top:12px;">
+          <li>Successfully built a unified DNS threat intelligence platform</li>
+          <li>ML ensemble model achieves ~92% accuracy on threat classification</li>
+          <li>Covers the full threat surface: DNS, WHOIS, certs, passive DNS, threat feeds</li>
+          <li>AI chatbot provides actionable, context-aware security guidance</li>
+          <li>Fully containerised and deployable with a single command</li>
+          <li>Addresses the gap of fragmented, inaccessible DNS security tooling</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🔭 Future Work</h3>
+        <ul style="margin-top:12px;">
+          <li>Real-time domain monitoring with alerting (email/webhook)</li>
+          <li>Expand ML training dataset with labelled phishing domains</li>
+          <li>Add BGP hijacking and route leak detection</li>
+          <li>User authentication and multi-domain dashboard</li>
+          <li>Browser extension for on-the-fly domain scanning</li>
+          <li>STIX/TAXII threat intelligence feed integration</li>
+          <li>Fine-tune LLM on DNS security corpus for better chatbot accuracy</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: References -->
+  <section class="slide" id="s10">
+    <div class="tag">Sources</div>
+    <h2>References</h2>
+    <div class="grid2" style="align-items:start;font-size:0.82rem;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card"><p><span class="accent">[1]</span> ICANN, "DNS Abuse Framework," <em>ICANN Security Team</em>, 2023. <a href="https://www.icann.org/dns-abuse" style="color:var(--accent2);">icann.org/dns-abuse</a></p></div>
+        <div class="card"><p><span class="accent">[2]</span> Spamhaus, "Domain Block List (DBL)," <em>Spamhaus Technology</em>, 2024. <a href="https://www.spamhaus.org/dbl/" style="color:var(--accent2);">spamhaus.org/dbl</a></p></div>
+        <div class="card"><p><span class="accent">[3]</span> PhishTank, "Community Phishing Verification," <em>OpenDNS</em>, 2024. <a href="https://phishtank.org" style="color:var(--accent2);">phishtank.org</a></p></div>
+        <div class="card"><p><span class="accent">[4]</span> Laurie, B. et al., "Certificate Transparency," <em>RFC 6962</em>, IETF, 2013.</p></div>
+        <div class="card"><p><span class="accent">[5]</span> Ariyapperuma, S. &amp; Mitchell, C., "Security Vulnerabilities in DNS," <em>IEEE AINA</em>, 2007.</p></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card"><p><span class="accent">[6]</span> Antonakakis, M. et al., "From Throw-Away Traffic to Bots: Detecting the Rise of DGA-Based Malware," <em>USENIX Security</em>, 2012.</p></div>
+        <div class="card"><p><span class="accent">[7]</span> Pedregosa, F. et al., "Scikit-learn: Machine Learning in Python," <em>JMLR 12</em>, 2011.</p></div>
+        <div class="card"><p><span class="accent">[8]</span> Groq Inc., "Groq LPU Inference Engine," 2024. <a href="https://groq.com" style="color:var(--accent2);">groq.com</a></p></div>
+        <div class="card"><p><span class="accent">[9]</span> Fastly / crt.sh, "Certificate Transparency Search," 2024. <a href="https://crt.sh" style="color:var(--accent2);">crt.sh</a></p></div>
+        <div class="card"><p><span class="accent">[10]</span> Mockapetris, P., "Domain Names — Concepts and Facilities," <em>RFC 1034</em>, IETF, 1987.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: Thank You -->
+  <section class="slide" id="s11" style="background:radial-gradient(ellipse at 40% 50%, rgba(59,130,246,0.15) 0%, transparent 60%), radial-gradient(ellipse at 70% 30%, rgba(6,182,212,0.1) 0%, transparent 50%), var(--bg);">
+    <div style="font-size:4rem;margin-bottom:16px;">🛡️</div>
+    <div class="tag">End of Presentation</div>
+    <h1 style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px;">Thank You</h1>
+    <p style="max-width:500px;text-align:center;font-size:1rem;margin-bottom:36px;">Questions, feedback, and discussion are welcome.</p>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;">
+      <div class="card" style="text-align:center;min-width:160px;">
+        <div style="font-size:1.5rem;margin-bottom:8px;">🌐</div>
+        <div style="font-size:0.78rem;color:var(--muted);">Live Demo</div>
+        <div style="font-size:0.9rem;color:var(--accent2);margin-top:4px;">localhost:3000</div>
+      </div>
+      <div class="card" style="text-align:center;min-width:160px;">
+        <div style="font-size:1.5rem;margin-bottom:8px;">💻</div>
+        <div style="font-size:0.78rem;color:var(--muted);">Source Code</div>
+        <div style="font-size:0.9rem;color:var(--accent2);margin-top:4px;">GitHub / FYP</div>
+      </div>
+      <div class="card" style="text-align:center;min-width:160px;">
+        <div style="font-size:1.5rem;margin-bottom:8px;">📄</div>
+        <div style="font-size:0.78rem;color:var(--muted);">Full Report</div>
+        <div style="font-size:0.9rem;color:var(--accent2);margin-top:4px;">docs/Dissertation</div>
+      </div>
+    </div>
+    <p style="margin-top:40px;font-size:0.8rem;color:var(--muted);">Rupam Barui · B.Tech Computer Science · 2025–26</p>
+  </section>
+
+</div><!-- #deck -->
+
+<div id="nav">
+  <button id="prev" onclick="go(-1)" disabled>&#8592;</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="counter">1 / 9</span>
+  <button id="next" onclick="go(1)">&#8594;</button>
+</div>
+
+<script>
+let current = 0;
+const allSlides = () => document.querySelectorAll('.slide');
+const allDots = () => document.querySelectorAll('.dot');
+
+function buildDots() {
+  const dr = document.getElementById('dots');
+  dr.innerHTML = '';
+  allSlides().forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' on' : '');
+    d.onclick = () => goTo(i);
+    dr.appendChild(d);
+  });
+  updateCounter();
+}
+
+function goTo(n) {
+  const ss = allSlides();
+  if (n < 0 || n >= ss.length) return;
+  ss[current].classList.remove('active');
+  current = n;
+  ss.forEach(s => s.classList.remove('active'));
+  ss[current].classList.add('active');
+  allDots().forEach((d, i) => d.classList.toggle('on', i === current));
+  updateCounter();
+}
+
+function updateCounter() {
+  const ss = allSlides();
+  document.getElementById('counter').textContent = `${current + 1} / ${ss.length}`;
+  document.getElementById('prev').disabled = current === 0;
+  document.getElementById('next').disabled = current === ss.length - 1;
+}
+
+function go(dir) { goTo(current + dir); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') go(-1);
+});
+
+window.addEventListener('load', buildDots);
+</script>
+</body>
+</html>

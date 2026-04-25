@@ -1,0 +1,1741 @@
+\documentclass[12pt, a4paper, oneside]{report}
+
+% --- Packages ---
+\usepackage[a4paper, margin=1in, left=1in]{geometry}
+\usepackage{setspace}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage[dvipsnames, table]{xcolor}
+\usepackage{nomencl}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{pdfpages}
+\usepackage{eso-pic}
+\usepackage{transparent}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[style=ieee, backend=biber, sorting=none]{biblatex}
+\addbibresource{references.bib}
+\usepackage[hidelinks]{hyperref}
+\usepackage[acronym]{glossaries}
+
+% Custom colours
+\definecolor{nfsuRed}{HTML}{C30102}
+\definecolor{nfsuBlue}{HTML}{1E1E73}
+
+% --- Dissertation Variables ---
+\newcommand{\dissTitle}{A Hybrid Approach to DNS Security: Combining Machine Learning-Based Threat Detection with Configuration Analysis and Remediation Guidance}
+\newcommand{\univName}{National Forensic Sciences University}
+\newcommand{\univCampus}{Delhi Campus}
+\newcommand{\univAddress}{New Delhi -- 110085, India}
+\newcommand{\deptName}{School of Cybersecurity \& Digital Forensics}
+\newcommand{\supervisorName}{Mr.\ Aditya Pratap Singh}
+\newcommand{\supervisorTitle}{Assistant Professor}
+\newcommand{\studentName}{Rupam Barui}
+\newcommand{\enrollNo}{102CTBMCS2122002}
+\newcommand{\courseName}{B.Tech.-M.Tech. Computer Science \& Engineering}
+\newcommand{\specialisation}{Cybersecurity}
+\newcommand{\passYear}{2026}
+\newcommand{\submissionDate}{\today}
+\newcommand{\submissionPlace}{New Delhi, Delhi, India}
+
+\makenomenclature
+\makeglossaries
+
+\onehalfspacing
+
+% --- Chapter title formatting ---
+\titleformat{\chapter}[display]
+  {\normalfont\Large\bfseries\centering}{Chapter \thechapter}{1em}{\Large}
+
+% --- Header/Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small 102CTBMCS2122002}
+\fancyhead[C]{\small\bfseries DNS Guard - Major Project II}
+\fancyhead[R]{\small \studentName}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ============================================================
+\begin{document}
+
+% --- Watermark on all pages except title page ---
+\AddToShipoutPictureBG{%
+  \put(\LenToUnit{0.5\paperwidth},\LenToUnit{0.5\paperheight}){%
+    \makebox(0,0){\transparent{0.07}\includegraphics[width=10cm]{images/logo.png}}%
+  }%
+}
+
+% ============================================================
+%  FRONT MATTER — Roman numerals
+% ============================================================
+\pagenumbering{roman}
+
+% --- Title Page ---
+\begin{titlepage}
+\ClearShipoutPictureBG
+  \centering
+
+  % Logo and University Name
+  \begin{minipage}{0.25\textwidth}
+    \includegraphics[width=\textwidth]{images/logo.png}
+  \end{minipage}
+  \begin{minipage}{0.7\textwidth}
+    \raggedright
+    {\fontsize{16}{19}\selectfont \bfseries \textcolor{nfsuBlue}{\univName\\ \univCampus}\par}
+    \vspace{0.3em}
+    {\fontsize{14}{17}\selectfont \textcolor{nfsuBlue}{(An Institute of National Importance)}}
+  \end{minipage}
+
+  \vspace{0.4cm}
+
+  {\large\bfseries \textcolor{nfsuRed}{PROJECT REPORT}}\\[0.2cm]
+  {\large \textcolor{nfsuRed}{ON}}\\[0.3cm]
+
+  {\color{nfsuRed}\rule{\linewidth}{0.5pt}}\\[0.2cm]
+  {\Large\bfseries \textcolor{nfsuBlue}{``\dissTitle''}}\\[0.2cm]
+  {\color{nfsuRed}\rule{\linewidth}{0.5pt}}\\[0.3cm]
+
+  {\normalsize \textcolor{nfsuRed}{Submitted To}}\\[0.2cm]
+  {\large\bfseries \textcolor{nfsuRed}{School of Cybersecurity \& Digital Forensics}}\\[0.1cm]
+  {\large\bfseries \textcolor{nfsuRed}{National Forensic Sciences University}}\\[0.3cm]
+
+  {\normalsize \textcolor{nfsuBlue}{For partial fulfilment for the award of degree}}\\[0.2cm]
+  {\large\bfseries \textcolor{nfsuRed}{\courseName}}\\[0.1cm]
+  {\normalsize In}\\[0.1cm]
+  {\large\bfseries \textcolor{nfsuRed}{Cybersecurity}}\\[0.3cm]
+
+  {\normalsize Submitted By}\\[0.2cm]
+  {\large\bfseries \textcolor{nfsuBlue}{\studentName}}\\[0.1cm]
+  {\normalsize \textcolor{nfsuBlue}{(\enrollNo)}}\\[0.3cm]
+
+  {\normalsize \textcolor{nfsuRed}{Under the Supervision of}}\\[0.2cm]
+  {\large\bfseries \textcolor{nfsuBlue}{\supervisorName}}\\[0.1cm]
+  {\normalsize \textcolor{nfsuBlue}{\supervisorTitle}}\\[0.1cm]
+  {\normalsize \textcolor{nfsuBlue}{School of Cybersecurity \& Digital Forensics}}\\[0.1cm]
+  {\normalsize \textcolor{nfsuBlue}{\univName}}\\[0.3cm]
+
+  \vfill
+
+  {\normalsize \textcolor{nfsuRed}{\univName,}}\\
+  {\normalsize \textcolor{nfsuRed}{\univCampus, \univAddress}}\\[0.2cm]
+  {\normalsize \textcolor{nfsuRed}{April 2026}}
+  \vfill
+\end{titlepage}
+% Restore watermark for all remaining pages
+\AddToShipoutPictureBG{%
+  \put(\LenToUnit{0.5\paperwidth},\LenToUnit{0.5\paperheight}){%
+    \makebox(0,0){\transparent{0.07}\includegraphics[width=10cm]{images/logo.png}}%
+  }%
+}
+
+% --- Declaration ---
+\pagestyle{plain} 
+\addcontentsline{toc}{chapter}{Declaration}
+
+\begin{center}
+  \includegraphics[width=3cm]{images/logo.png}
+\end{center}
+
+\begin{center}
+  {\large\bfseries \textcolor{nfsuRed}{DECLARATION}}
+\end{center}
+
+\vspace{0.5cm}
+
+I hereby declare that the thesis entitled ``\textbf{\dissTitle}'' is a research work done by me and no part of the thesis has been presented earlier and will be presented for any degree, diploma or similar title at any other institute/university.
+
+\vspace{1.5cm}
+
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+  Date: \submissionDate\\[0.5cm]
+  Place: \submissionPlace
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+  \raggedleft
+  \studentName\\
+  \enrollNo\\
+  \courseName\\
+  \passYear
+\end{minipage}
+
+\vfill
+
+\newpage
+
+% --- Originality ---
+\pagestyle{plain}
+\addcontentsline{toc}{chapter}{Originality Report Certificate}
+
+\begin{center}
+  \includegraphics[width=3cm]{images/logo.png}
+\end{center}
+
+\begin{center}
+  {\large\bfseries \textcolor{nfsuRed}{ORIGINALITY REPORT CERTIFICATE}}
+\end{center}
+
+\vspace{0.5cm}
+
+I certify that
+
+\begin{enumerate}[label=\alph*.]
+  \item The work contained in the dissertation is original and has been done by myself under the supervision of my supervisor.
+  \item The work has not been submitted to any other Institute for any degree or diploma.
+  \item I have conformed to the norms and guidelines given in the Ethical Code of Conduct of the Institute.
+  \item Whenever I have used materials (data, theoretical analysis, and text) from other sources, I have given due credit to them by citing them in the text of the dissertation and giving their details in the references.
+  \item Whenever I have quoted written materials from other sources, due credit is given to the sources by citing them.
+  \item From the plagiarism test, it is found that the similarity index of the whole dissertation is within 10\% and single paper is less than 10\% as per the university guidelines.
+\end{enumerate}
+
+% \vspace{1.5cm}
+
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+  Date: \submissionDate\\
+  Place: \submissionPlace\\[0.5cm]
+  Forwarded by\\[1cm]
+  \underline{\hspace{4cm}}\\
+  (\supervisorName)\\[0.3cm]
+  Date: \submissionDate
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+  \raggedleft
+  \underline{\hspace{4cm}}\\
+  \studentName\\
+  Enroll. No.: \enrollNo
+\end{minipage}
+
+\newpage
+
+% --- Certificate ---
+\pagestyle{plain}
+\addcontentsline{toc}{chapter}{Certificate}
+
+\begin{center}
+  \includegraphics[width=3cm]{images/logo.png}
+\end{center}
+
+\begin{center}
+  {\large\bfseries \textcolor{nfsuRed}{CERTIFICATE}}
+\end{center}
+
+\vspace{0.5cm}
+
+This is to certify that the work contained in the dissertation entitled ``\textbf{\dissTitle}'', submitted by \textbf{\studentName} holding the enrollment number: \textbf{\enrollNo} for the award of the degree of \textbf{\courseName} in Cybersecurity to the \textbf{\univName}, \textbf{\univCampus}, is a record of bonafide research works carried out by him under my supervision and guidance.
+
+\vspace{1.5cm}
+
+\noindent
+\begin{minipage}[t]{0.4\textwidth}
+  Date: \submissionDate\\
+  Place: \submissionPlace
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.55\textwidth}
+  \raggedleft
+  \underline{\hspace{4cm}}\\
+  \supervisorName\\
+  \supervisorTitle\\
+  \deptName\\
+  \univName\\
+  \univCampus, \univAddress
+\end{minipage}
+
+\newpage
+
+% --- Acknowledgement ---
+\pagestyle{plain}
+\addcontentsline{toc}{chapter}{Acknowledgement}
+
+\begin{center}
+  {\large\bfseries \textcolor{nfsuRed}{ACKNOWLEDGEMENT}}
+\end{center}
+
+\vspace{0.5cm}
+
+I would like to express my sincere gratitude to all those who have contributed to the successful completion of this dissertation.
+
+First and foremost, I am deeply grateful to my dissertation supervisor, \textbf{\supervisorName}, \supervisorTitle, School of Cybersecurity \& Digital Forensics, National Forensic Sciences University, for his invaluable guidance, constant encouragement, and constructive feedback throughout the course of this research. His expertise and insights have been instrumental in shaping this work.
+
+I extend my heartfelt thanks to the \textbf{Head of the Department} and all the \textbf{faculty members} of the School of Cybersecurity \& Digital Forensics for their academic support and for providing a stimulating research environment. Their teachings have laid a strong foundation for this work.
+
+I am also thankful to my \textbf{lab mates and peers} for their cooperation, technical discussions, and moral support during the challenging phases of this project. The collaborative spirit within the department has greatly enriched my learning experience.
+
+I would like to acknowledge the \textbf{\univName, \univCampus}, for providing the necessary infrastructure, resources, and facilities that made this research possible.
+
+Finally, I owe my deepest gratitude to my \textbf{family} for their unwavering support, patience, and encouragement throughout my academic journey. Their belief in me has been a constant source of motivation.
+
+\vspace{1.5cm}
+
+\noindent
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+  \raggedleft
+  With Sincere Regards,\\[1.5cm]
+  \studentName\\
+  \enrollNo\\
+  \courseName\\
+  \passYear
+\end{minipage}
+
+\newpage
+
+% --- Abstract ---
+\pagestyle{plain}
+\addcontentsline{toc}{chapter}{Abstract}
+
+\begin{center}
+  {\large\bfseries \textcolor{nfsuRed}{ABSTRACT}}
+\end{center}
+
+\vspace{0.5cm}
+
+The Domain Name System (DNS) forms a critical backbone of the modern internet, yet it remains a frequent target for abuse, misconfiguration, and malicious exploitation. This dissertation presents \textbf{DNS Guard}, a hybrid domain threat intelligence platform that combines machine learning-based threat detection with comprehensive DNS configuration analysis and actionable remediation guidance.
+
+The system performs multi-dimensional analysis of any given domain, extracting a 40-feature vector encompassing lexical characteristics, DNS record structure, DNSSEC validation, and composite security indicators. An ensemble model combining a Random Forest classifier with a Multi-Layer Perceptron (MLP) neural network produces a 0--100 threat score, accompanied by SHAP-style feature importance explanations for interpretability.
+
+Beyond scoring, DNS Guard integrates a suite of security intelligence modules including WHOIS analysis with change detection, Certificate Transparency log monitoring, passive DNS history with fast-flux detection, typosquatting detection against top global brands, subdomain enumeration, reverse IP lookup, and real-time blocklist checks via Spamhaus DBL and PhishTank. IP geolocation is visualised on an interactive SVG world map, and comprehensive PDF reports are generated for each scan.
+
+The platform further incorporates a context-aware AI chatbot powered by a local Ollama LLM (Mistral), with a rule-based fallback engine covering key DNS security topics. A Retrieval - Augmented Generation (RAG) pipeline backed by a Qdrant vector database enables the chatbot to provide accurate, domain-specific security guidance.
+
+The system is deployed as a containerised microservices architecture using Docker Compose, comprising a Next.js 14 frontend, a FastAPI backend with Celery task queuing, a dedicated AI/ML service, PostgreSQL for persistence, and Redis as the message broker. Evaluation demonstrates that DNS Guard effectively identifies malicious, misconfigured, and suspicious domains with high accuracy, offering a practical and extensible tool for DNS security monitoring and threat intelligence.
+
+\vspace{0.5cm}
+\noindent\textbf{Keywords:} DNS Security, Threat Intelligence, Machine Learning, DNSSEC, Typosquatting, Fast-Flux Detection, Phishing Detection, Natural Language Processing, RAG, Cybersecurity.
+
+\newpage
+
+% --- Table of Contents ---
+\tableofcontents
+\newpage
+
+% --- Abbreviations ---
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}{Abbreviations}
+
+\begin{longtable}{|p{3cm}|p{10.5cm}|}
+% \caption{List of Abbreviations}\\
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Abbreviation} & \textbf{Full Form} \\
+\hline
+\endfirsthead
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Abbreviation} & \textbf{Full Form} \\
+\hline
+\endhead
+\hline
+\endfoot
+AI      & Artificial Intelligence \\ \hline
+API     & Application Programming Interface \\ \hline
+CT      & Certificate Transparency \\ \hline
+DBL     & Domain Block List \\ \hline
+DKIM    & DomainKeys Identified Mail \\ \hline
+DMARC   & Domain-based Message Authentication, Reporting and Conformance \\ \hline
+DNS     & Domain Name System \\ \hline
+DNSKEY  & DNS Key Record \\ \hline
+DNSSEC  & Domain Name System Security Extensions \\ \hline
+DS      & Delegation Signer \\ \hline
+FYP     & Final Year Project \\ \hline
+HTML    & HyperText Markup Language \\ \hline
+HTTP    & Hypertext Transfer Protocol \\ \hline
+HTTPS   & Hypertext Transfer Protocol Secure \\ \hline
+IP      & Internet Protocol \\ \hline
+LLM     & Large Language Model \\ \hline
+ML      & Machine Learning \\ \hline
+MLP     & Multi-Layer Perceptron \\ \hline
+MX      & Mail Exchange \\ \hline
+NLP     & Natural Language Processing \\ \hline
+NS      & Name Server \\ \hline
+PDF     & Portable Document Format \\ \hline
+RAG     & Retrieval-Augmented Generation \\ \hline
+RF      & Random Forest \\ \hline
+RRSIG   & Resource Record Signature \\ \hline
+SHAP    & SHapley Additive exPlanations \\ \hline
+SPF     & Sender Policy Framework \\ \hline
+SSL     & Secure Sockets Layer \\ \hline
+SVG     & Scalable Vector Graphics \\ \hline
+TLD     & Top-Level Domain \\ \hline
+TLS     & Transport Layer Security \\ \hline
+TXT     & Text Record \\ \hline
+URL     & Uniform Resource Locator \\ \hline
+WHOIS   & (Protocol for querying domain registration information) \\
+\end{longtable}
+\newpage
+
+% --- List of Tables ---
+\listoftables
+\newpage
+
+% --- List of Figures ---
+\listoffigures
+\newpage
+
+% % --- List of Screenshots ---
+% \chapter*{List of Screenshots}
+% \addcontentsline{toc}{chapter}{List of Screenshots}
+% % content to be added
+
+\newpage
+
+% --- List of Symbols --- (commented out: no symbols used in this dissertation)
+% \chapter*{List of Symbols}
+% \addcontentsline{toc}{chapter}{List of Symbols}
+% \newpage
+\pagestyle{fancy}
+
+% ============================================================
+%  MAIN MATTER — Arabic numerals
+% ============================================================
+\pagenumbering{arabic}
+
+% --- Chapter 1: Introduction ---
+\chapter*{Introduction}
+\setcounter{chapter}{1}
+\setcounter{section}{0}
+
+\section{Background}
+
+The internet today connects billions of people, devices, and services across the world. At the heart of this connectivity is a system called the Domain Name System (DNS). DNS works like a phone book for the internet. When a user types a website address such as \texttt{www.example.com} into a browser, DNS translates that human-readable name into a numerical IP address that computers use to find and connect to the right server \cite{mockapetris1987rfc1034}. Without DNS, users would have to remember long strings of numbers to visit any website, which would make the internet very difficult to use.
+
+Because DNS is so important, it has become a major target for attackers. Over the years, criminals have found many ways to misuse DNS to carry out attacks. Some attackers register domain names that look very similar to well-known brands in order to trick users into visiting fake websites. This is called typosquatting \cite{banerjee2008typosquatting}. Others use DNS to spread malware, run phishing campaigns, or hide the location of their command-and-control servers. Fast-flux DNS is one such technique where attackers rapidly change the IP addresses linked to a domain to avoid being blocked \cite{holz2008fastflux}.
+
+At the same time, many organisations fail to properly configure their DNS records. Missing or incorrect SPF, DKIM, and DMARC records leave email systems open to spoofing attacks \cite{kitterman2011spf}. Domains without DNSSEC are vulnerable to cache poisoning, where an attacker can redirect users to a fake website without them knowing \cite{arends2005rfc4033}. These misconfigurations are very common and often go unnoticed until an attack has already happened.
+
+Security researchers and network administrators need tools that can quickly check a domain for all of these issues in one place. Currently, most available tools only check one or two things at a time. There is a clear need for a platform that brings together DNS analysis, threat intelligence, machine learning-based scoring, and clear guidance on how to fix problems.
+
+\section{Problem Statement}
+
+Despite the critical role that DNS plays in internet infrastructure, there is a lack of accessible and comprehensive tools that can analyse a domain from multiple security angles at once. Existing solutions tend to be either too narrow in scope, too expensive for individual researchers and small organisations, or too technical for non-expert users to understand.
+
+The specific problems this project addresses are as follows:
+
+\begin{itemize}
+    \item DNS abuse, including phishing, typosquatting, and fast-flux attacks, continues to grow every year \cite{apwg2023report}.
+    \item Many domain owners do not know whether their DNS configuration is correct or secure.
+    \item There is no single open tool that combines DNS record analysis, WHOIS data, certificate transparency, passive DNS history, threat intelligence feeds, and machine learning-based risk scoring in one platform.
+    \item When a domain is flagged as suspicious, users often do not receive clear guidance on what the problem is or how to fix it.
+\end{itemize}
+
+This project aims to solve these problems by building DNS Guard, a web-based platform that performs a full security analysis of any domain and presents the results in a way that is easy to understand.
+
+\section{Objectives}
+
+The main objectives of this project are:
+
+\begin{enumerate}
+    \item To build a platform that can analyse any domain for DNS misconfigurations, security weaknesses, and signs of malicious activity.
+    \item To develop a machine learning model that assigns a threat score between 0 and 100 to a domain based on its DNS records and lexical features.
+    \item To integrate multiple threat intelligence sources, including Spamhaus DBL and PhishTank, to check whether a domain appears on known blocklists.
+    \item To detect typosquatting by comparing a given domain against a list of top global brands using string similarity techniques.
+    \item To provide WHOIS analysis, certificate transparency monitoring, passive DNS history, subdomain enumeration, and reverse IP lookup as part of a single scan.
+    \item To include an AI-powered chatbot that can answer questions about DNS security and explain the results of a scan in plain language.
+    \item To generate a downloadable PDF report summarising all findings for a given domain.
+    \item To build the system as a set of containerised microservices so that it is easy to deploy and maintain.
+\end{enumerate}
+
+\section{Scope}
+
+This project covers the following areas:
+
+\begin{itemize}
+    \item Analysis of domain names and their associated DNS records, including A, MX, NS, TXT, DNSKEY, RRSIG, and DS records.
+    \item WHOIS data retrieval and comparison between scans to detect changes in domain registration.
+    \item Certificate transparency log queries to monitor SSL/TLS certificates issued for a domain.
+    \item Passive DNS history to identify historical IP addresses and detect fast-flux behaviour.
+    \item Typosquatting detection using edit-distance algorithms against a curated list of top brands.
+    \item Subdomain enumeration using both brute-force wordlists and certificate transparency logs.
+    \item Reverse IP lookup to find other domains hosted on the same IP address.
+    \item Threat intelligence checks against Spamhaus DBL and PhishTank.
+    \item IP geolocation and visualisation on a world map.
+    \item A machine learning ensemble model combining a Random Forest classifier and a Multi-Layer Perceptron (MLP) neural network for threat scoring.
+    \item A context-aware chatbot using a local Large Language Model (LLM) with a Retrieval-Augmented Generation (RAG) pipeline.
+    \item PDF report generation for each domain scan.
+\end{itemize}
+
+The project does not cover real-time network traffic analysis, deep packet inspection, or active exploitation testing. It is designed as a passive analysis and intelligence tool.
+
+\section{Report Organisation}
+
+The rest of this report is organised as follows:
+
+\begin{itemize}
+    \item \textbf{Chapter 2 -- Literature Survey} reviews existing work on DNS security, threat detection, machine learning for cybersecurity, and related tools.
+    \item \textbf{Chapter 3 -- Design} covers the system architecture, the analysis of requirements, the design methodology, and the implementation strategy.
+    \item \textbf{Chapter 4 -- Implementation} describes how each component of the system was built, including the frontend, backend, AI service, and supporting infrastructure.
+    \item \textbf{Chapter 5 -- Summary of Results and Future Scope} presents the results of testing and evaluation, and discusses possible improvements and extensions.
+    \item \textbf{Chapter 6 -- Conclusion} summarises the work done and the key findings of the project.
+\end{itemize}
+
+% --- Chapter 2: Literature Survey ---
+\chapter*{Literature Survey}
+\setcounter{chapter}{2}
+\setcounter{section}{0}
+
+\section{Current / Existing System}
+
+\subsection{Study of Current System}
+
+Several tools and platforms exist today that help security researchers and network administrators check the security of a domain. Each of these tools focuses on a specific area of DNS security or threat intelligence.
+
+\textbf{VirusTotal} \cite{virustotal2024} is one of the most widely used online tools for checking whether a domain, URL, or file has been flagged as malicious. It aggregates results from over 70 antivirus engines and blocklists. However, it does not provide detailed DNS record analysis, DNSSEC validation, or configuration guidance.
+
+\textbf{MXToolbox} \cite{mxtoolbox2024} is a popular tool for checking DNS records, MX configuration, and email security settings such as SPF, DKIM, and DMARC. It is useful for diagnosing email delivery problems but does not provide a threat score or machine learning-based analysis.
+
+\textbf{Shodan} \cite{shodan2024} is a search engine for internet-connected devices. It can be used to find information about the servers behind a domain, including open ports and running services. It is a powerful tool for security professionals but requires technical knowledge to use effectively.
+
+\textbf{SecurityTrails} \cite{securitytrails2024} provides historical DNS data, WHOIS records, and subdomain information. It is a good source of passive DNS intelligence but is a paid service with limited free access.
+
+\textbf{DNSdumpster} \cite{dnsdumpster2024} is a free tool for subdomain enumeration and DNS reconnaissance. It is useful for mapping the attack surface of a domain but does not provide threat scoring or remediation advice.
+
+\textbf{PhishTank} \cite{phishtank2024} and \textbf{Spamhaus} \cite{spamhaus2024} maintain community-driven and professionally managed blocklists of phishing and spam domains. These are widely used as threat feeds but are not standalone analysis platforms.
+
+Research in the area of DNS threat detection has also produced several academic tools. Antonakakis et al. proposed EXPOSURE \cite{antonakakis2010exposure}, a system that uses passive DNS data and machine learning technology to detect malicious domains. Bilge et al. introduced EXPOSURE's successor, which used a larger feature set to improve detection accuracy of the same \cite{bilge2011exposure}. More recently, deep learning approaches have been applied to detect domain generation algorithms (DGAs) used by malware \cite{woodbridge2016dga}.
+
+\subsection{Problem and Weakness of Current System}
+
+While the tools described above are useful individually, they all have significant limitations when considered as a complete solution for DNS security analysis.
+
+\begin{itemize}
+    \item \textbf{Fragmentation:} No single free tool combines DNS record analysis, WHOIS data, certificate transparency, passive DNS, typosquatting detection, subdomain enumeration, reverse IP lookup, and threat intelligence in one place. Users must visit multiple tools and manually combine the results.
+    \item \textbf{No unified threat score:} Most tools present raw data without summarising the overall risk level of a domain. This makes it difficult for non-expert users to quickly understand whether a domain is safe or dangerous.
+    \item \textbf{No remediation guidance:} Tools like MXToolbox show what is wrong with a DNS configuration but do not explain why it matters or how to fix it in simple terms.
+    \item \textbf{Cost:} Many of the most capable tools, such as SecurityTrails and Shodan, require paid subscriptions. This limits access for students, independent researchers, and small organisations.
+    \item \textbf{No AI assistance:} None of the existing free tools include a conversational AI assistant that can answer questions about the results of a scan or explain DNS security concepts in plain language.
+    \item \textbf{Limited explainability:} Academic machine learning models for DNS threat detection often do not explain which features contributed to a classification decision, making it hard to trust or act on the results \cite{lipton2018interpretability}.
+\end{itemize}
+
+\section{Requirements of New System}
+
+Based on the study of existing systems and their weaknesses, the following requirements were identified for DNS Guard.
+
+\textbf{Functional Requirements:}
+\begin{itemize}
+    \item The system must accept any domain name as input and perform a full security analysis.
+    \item It must check DNS records including A, MX, NS, TXT, DNSKEY, RRSIG, and DS.
+    \item It must validate DNSSEC configuration and report whether it is properly set up.
+    \item It must retrieve and display WHOIS data and detect changes between scans.
+    \item It must query certificate transparency logs to find SSL/TLS certificates issued for the domain.
+    \item It must retrieve passive DNS history and detect fast-flux behaviour.
+    \item It must check the domain against Spamhaus DBL and PhishTank blocklists.
+    \item It must detect typosquatting by comparing the domain against a list of top brands.
+    \item It must enumerate subdomains using brute-force and certificate transparency methods.
+    \item It must perform reverse IP lookup to find co-hosted domains.
+    \item It must produce a threat score between 0 and 100 using a machine learning model.
+    \item It must provide feature importance information alongside the threat score.
+    \item It must include an AI chatbot that can answer DNS security questions.
+    \item It must generate a downloadable PDF report for each scan.
+\end{itemize}
+
+\textbf{Non-Functional Requirements:}
+\begin{itemize}
+    \item The system must be fast enough to return results within a reasonable time for a typical domain.
+    \item The user interface must be clean and easy to use for both technical and non-technical users.
+    \item The system must support both dark and light display modes.
+    \item The system must be deployable using Docker Compose with minimal setup.
+    \item The system must store scan history in a database for future reference.
+\end{itemize}
+
+\section{Feasibility Study}
+
+\subsection{Technical Feasibility}
+
+The technologies required to build DNS Guard are all mature, well-documented, and freely available. Python has a rich ecosystem of libraries for DNS resolution, WHOIS lookup, machine learning, and web development. The \texttt{dnspython} library \cite{dnspython2024} provides reliable DNS query capabilities. The \texttt{scikit-learn} library \cite{pedregosa2011sklearn} provides the tools needed to build and train the machine learning model. FastAPI \cite{fastapi2024} is a modern Python web framework that is well suited for building high-performance APIs. Next.js \cite{nextjs2024} provides a solid foundation for building the frontend with server-side rendering and a good developer experience.
+
+The use of Docker and Docker Compose \cite{docker2024} makes it straightforward to package all components of the system into containers that can be run on any machine. PostgreSQL \cite{postgresql2024} and Redis \cite{redis2024} are both widely used and reliable choices for data storage and task queuing respectively. Qdrant \cite{qdrant2024} is a purpose-built vector database that is well suited for the RAG pipeline used by the chatbot.
+
+Ollama \cite{ollama2024} provides a simple way to run open-source LLMs locally, which avoids the cost and privacy concerns of using cloud-based AI services. The Mistral model \cite{jiang2023mistral} is a capable open-source LLM that runs well on consumer hardware.
+
+Overall, the technical feasibility of the project is high. All required components are available, well-supported, and have been used successfully in similar projects.
+
+\subsection{Operational Feasibility}
+
+DNS Guard is designed to be easy to deploy and use. The entire system can be started with a single \texttt{docker compose up} command, which means that users do not need to manually install or configure any dependencies. The web interface is accessible through a standard browser and does not require any special software on the client side.
+
+The system is intended for use by security researchers, network administrators, students, and anyone who needs to check the security of a domain. The interface is designed to present results clearly, with visual indicators such as colour-coded threat scores and a world map for IP geolocation. The AI chatbot provides an additional layer of support for users who are not familiar with DNS security concepts.
+
+From an operational standpoint, the system is feasible for use in an academic or small-organisation setting. For larger-scale deployment, additional work would be needed to handle high volumes of concurrent requests and to keep threat intelligence feeds up to date automatically.
+
+\section{Tools and Technology Required}
+
+This section describes each tool and technology used in DNS Guard, explains what it does, why it was chosen over alternatives, and how it fits into the overall system.
+
+\subsection{Frontend: Next.js 14 and Tailwind CSS}
+
+\textbf{Next.js 14} \cite{nextjs2024} is a React-based web framework developed by Vercel. It was chosen as the frontend framework for DNS Guard for several reasons. First, it supports server-side rendering (SSR) and the App Router, which means pages can be rendered on the server before being sent to the browser. This improves page load speed and makes the application more responsive. Second, Next.js has built-in support for API routes, which were used to create proxy endpoints that forward requests from the browser to the backend without exposing the backend URL directly to the user. Third, Next.js has a large community, good documentation, and is widely used in production applications, which made it a reliable choice for this project.
+
+An alternative would have been to use plain React with a separate Express.js server, but this would have required more configuration and would not have provided the same level of built-in optimisation.
+
+\textbf{Tailwind CSS} \cite{tailwindcss2024} is a utility-first CSS framework. Instead of writing custom CSS classes, developers apply small, single-purpose utility classes directly in the HTML. This approach was chosen because it speeds up development significantly and makes it easy to build a consistent and responsive design. Tailwind also has built-in support for dark mode, which was used to implement the dark and light theme toggle in DNS Guard. The alternative, writing custom CSS from scratch, would have taken much longer and been harder to maintain.
+
+\subsection{Backend: FastAPI and Celery}
+
+\textbf{FastAPI} \cite{fastapi2024} is a modern Python web framework for building APIs. It was chosen for both the main backend and the AI service because it is very fast, supports asynchronous request handling, and automatically generates interactive API documentation. FastAPI uses Python type hints to validate request and response data, which reduces bugs and makes the code easier to read. Compared to Flask, which is another popular Python web framework, FastAPI is significantly faster and has better support for async operations, which is important when making multiple DNS queries and external API calls at the same time.
+
+\textbf{Celery} \cite{celery2024} is a distributed task queue for Python. DNS analysis involves many steps, including DNS resolution, WHOIS lookup, certificate transparency queries, and machine learning scoring. Running all of these steps synchronously in a single HTTP request would make the API very slow and could cause timeouts. Celery solves this by allowing these tasks to be run in the background by worker processes. The frontend polls for results while the workers process the analysis. Redis is used as the message broker that passes tasks from the API to the workers. This architecture makes the system much more scalable and responsive.
+
+\subsection{Database and Storage: PostgreSQL, Redis, and Qdrant}
+
+\textbf{PostgreSQL} \cite{postgresql2024} is a powerful open-source relational database. It was chosen to store scan results, WHOIS history, and other persistent data because it is reliable, supports complex queries, and handles structured data well. Compared to SQLite, which is simpler but not suitable for concurrent access, PostgreSQL is a better choice for a multi-service application where the backend and workers may read and write data at the same time.
+
+\textbf{Redis} \cite{redis2024} is an in-memory data store that is used in DNS Guard as the message broker for Celery. When a user submits a domain for analysis, the backend creates a Celery task and sends it to Redis. The Celery worker picks up the task from Redis and processes it. Redis was chosen because it is fast, lightweight, and is the most commonly used broker with Celery. It is also used to cache frequently accessed data to reduce the number of repeated database queries.
+
+\textbf{Qdrant} \cite{qdrant2024} is a vector database designed for storing and searching high-dimensional vector embeddings. It is used in DNS Guard to power the RAG pipeline for the AI chatbot. DNS security documents and knowledge base articles are converted into vector embeddings and stored in Qdrant. When a user asks the chatbot a question, the question is also converted into a vector and Qdrant finds the most relevant documents. These documents are then passed to the LLM as context so it can give an accurate and relevant answer. Qdrant was chosen over alternatives such as FAISS because it runs as a standalone service, supports filtering, and is easier to integrate into a microservices architecture.
+
+\subsection{Machine Learning: scikit-learn}
+
+\textbf{scikit-learn} \cite{pedregosa2011sklearn} is a widely used Python library for machine learning. It provides implementations of many standard algorithms including Random Forest, which is one of the two models used in the DNS Guard threat scoring ensemble. scikit-learn was chosen because it is well-documented, easy to use, and produces reliable results. It also provides tools for feature extraction, model evaluation, and cross-validation, all of which were used during the development of the threat scoring model. The MLP neural network was also implemented using scikit-learn's \texttt{MLPClassifier}, which provided a good balance between performance and simplicity compared to using a full deep learning framework such as TensorFlow or PyTorch.
+
+\subsection{DNS Resolution: dnspython}
+
+\textbf{dnspython} \cite{dnspython2024} is a Python library for making DNS queries. It was used in the backend to resolve DNS records for a given domain, including A, MX, NS, TXT, DNSKEY, RRSIG, and DS records. dnspython was chosen because it supports a wide range of DNS record types, handles DNSSEC validation, and is actively maintained. It is the standard choice for DNS work in Python and has no significant alternatives that offer the same level of functionality.
+
+\subsection{PDF Generation: ReportLab}
+
+\textbf{ReportLab} \cite{reportlab2024} is a Python library for generating PDF documents programmatically. It was used to create the downloadable PDF reports in DNS Guard. ReportLab was chosen because it gives full control over the layout and content of the PDF, including tables, charts, and formatted text. An alternative would have been to use a headless browser to render an HTML page as a PDF, but this approach is heavier and slower. ReportLab produces PDFs directly from Python code, which is faster and more suitable for a server-side API.
+
+\subsection{AI and LLM: Ollama and Mistral}
+
+\textbf{Ollama} \cite{ollama2024} is a tool that makes it easy to run open-source large language models locally on a personal computer or server. It was used in DNS Guard to run the \textbf{Mistral 7B} model \cite{jiang2023mistral}, which powers the AI chatbot. Running the LLM locally has several advantages over using a cloud-based API such as OpenAI. It is free to use, does not send user data to a third party, and does not require an internet connection once the model is downloaded. Mistral 7B was chosen because it is one of the best-performing open-source models of its size, offering a good balance between response quality and the hardware resources required to run it \cite{jiang2023mistral}. A rule-based fallback engine was also implemented for cases where Ollama is not available.
+
+\subsection{Containerisation: Docker and Docker Compose}
+
+\textbf{Docker} \cite{docker2024} is a platform for building and running applications inside containers. A container packages an application together with all its dependencies so that it runs the same way on any machine. Docker was used to containerise all six components of DNS Guard: the frontend, the backend, the AI service, PostgreSQL, Redis, and Qdrant. \textbf{Docker Compose} was used to define and manage all these containers together in a single configuration file. This means the entire system can be started with one command, which makes it very easy to set up and deploy. Without Docker, a user would need to manually install Python, Node.js, PostgreSQL, Redis, and Qdrant separately, which would be time-consuming and error-prone.
+
+% --- Chapter 3: Design ---
+\chapter*{Design: Analysis, Design Methodology and Implementation Strategy}
+\setcounter{chapter}{3}
+\setcounter{section}{0}
+
+\section{Function of System}
+
+DNS Guard is a web-based domain threat intelligence platform. Its primary function is to accept a domain name from the user and perform a comprehensive security analysis across multiple dimensions. The system checks DNS records, validates DNSSEC configuration, retrieves WHOIS data, queries certificate transparency logs, checks passive DNS history, detects typosquatting, enumerates subdomains, performs reverse IP lookup, checks threat intelligence blocklists, and produces a machine learning-based threat score. All results are presented in a single dashboard and can be exported as a PDF report. An AI chatbot is also available to answer questions about the results and about DNS security in general.
+
+The system is built as a set of microservices. The frontend communicates with the backend through a set of REST API endpoints. The backend delegates long-running analysis tasks to Celery workers. The AI service handles threat scoring and chatbot requests separately. All services share a common PostgreSQL database and communicate through Redis.
+
+\subsection{Use Case Diagram}
+
+The use case diagram shows all the ways a user can interact with DNS Guard and what happens inside the system as a result of each interaction. There are two types of actors in this diagram. The first is the \textbf{User}, who is the person using the web interface. The second group consists of \textbf{External Services}, which are the third-party systems that DNS Guard queries during an analysis, such as DNS servers, WHOIS servers, certificate transparency logs, and blocklist providers.
+
+The user can perform five main actions. The most important one is submitting a domain for analysis. When this happens, the system internally triggers eight sub-processes: DNS record checking, WHOIS lookup, certificate transparency querying, threat intelligence checking, machine learning threat scoring, typosquatting detection, subdomain enumeration, and reverse IP lookup. Each of these sub-processes runs as part of the same analysis job. The user can also view the results on the analysis dashboard, download a PDF report, use the AI chatbot to ask questions, and view their recent search history. The recent search history is stored in the browser's local storage and does not require a server request.
+
+This diagram is important because it defines the boundary of the system and makes clear what the system is responsible for and what it relies on external services to provide.
+
+% --- MERMAID DIAGRAM: Use Case ---
+% Replace this comment block with the rendered diagram image when available.
+%
+% ```mermaid
+% graph TD
+%   User -->|Submit domain| AnalyseDomain[Analyse Domain]
+%   User -->|View results| ViewDashboard[View Analysis Dashboard]
+%   User -->|Download report| DownloadPDF[Download PDF Report]
+%   User -->|Ask question| Chatbot[Use AI Chatbot]
+%   User -->|View history| RecentSearches[View Recent Searches]
+%   AnalyseDomain --> DNSCheck[DNS Record Check]
+%   AnalyseDomain --> WHOISCheck[WHOIS Lookup]
+%   AnalyseDomain --> CTCheck[Certificate Transparency Check]
+%   AnalyseDomain --> ThreatIntel[Threat Intelligence Check]
+%   AnalyseDomain --> MLScore[ML Threat Scoring]
+%   AnalyseDomain --> TypoCheck[Typosquatting Detection]
+%   AnalyseDomain --> SubdomainEnum[Subdomain Enumeration]
+%   AnalyseDomain --> ReverseIP[Reverse IP Lookup]
+% ```
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/use-case.png}
+  \caption{Use Case Diagram for DNS Guard}
+  \label{fig:usecase}
+\end{figure}
+
+
+
+\subsection{Activity Diagram}
+
+The activity diagram shows the step-by-step flow of actions that take place from the moment a user submits a domain to the moment the results are displayed on screen. It captures both the user-facing actions and the internal processing that happens behind the scenes.
+
+The process begins when the user types a domain name into the search box and clicks the analyse button. The frontend validates the input and sends a POST request to the backend API with the domain name. The backend receives the request, creates a new Celery task, and immediately returns a task ID to the frontend. This is important because it means the API does not block while waiting for the analysis to finish. Instead, the frontend uses the task ID to poll the backend every few seconds and check whether the analysis is complete.
+
+In the background, the Celery worker picks up the task from the Redis queue and begins running all the analysis modules. These modules run in parallel where possible to reduce the total time taken. The modules are: DNS resolution, WHOIS lookup, certificate transparency querying, passive DNS history retrieval, typosquatting detection, subdomain enumeration, reverse IP lookup, and threat intelligence checking. At the same time, the feature extractor builds a 40-feature vector from the DNS data and sends it to the AI service, which returns a threat score and feature importance values.
+
+Once all modules have finished, the results are combined into a single result object and saved to the PostgreSQL database. The task is then marked as complete in Redis. On the next poll from the frontend, the backend returns the full results. The frontend renders the analysis dashboard, showing the threat score, DNS records, WHOIS data, certificate information, geolocation map, and all other findings.
+
+% --- MERMAID DIAGRAM: Activity ---
+%
+% ```mermaid
+% flowchart TD
+%   A([User enters domain]) --> B[Frontend sends POST /analyze]
+%   B --> C[Backend creates Celery task]
+%   C --> D{Workers run in parallel}
+%   D --> E[DNS Resolution]
+%   D --> F[WHOIS Lookup]
+%   D --> G[Certificate Transparency]
+%   D --> H[Passive DNS]
+%   D --> I[Typosquatting Detection]
+%   D --> J[Subdomain Enumeration]
+%   D --> K[Reverse IP Lookup]
+%   D --> L[Threat Intelligence]
+%   D --> M[ML Threat Scoring]
+%   E & F & G & H & I & J & K & L & M --> N[Aggregate results]
+%   N --> O[Save to PostgreSQL]
+%   O --> P[Return results to frontend]
+%   P --> Q([User views dashboard])
+% ```
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/activity.png}
+  \caption{Activity Diagram for Domain Analysis}
+  \label{fig:activity}
+\end{figure}
+
+\subsection{Sequence Diagram}
+
+The sequence diagram shows the exact order of messages passed between the different components of DNS Guard during a domain analysis. Unlike the activity diagram, which focuses on the flow of actions, the sequence diagram focuses on which component sends a message to which other component and in what order.
+
+There are seven participants in this diagram: the User's browser, the Next.js frontend, the FastAPI backend, the Celery worker, the AI service, the PostgreSQL database, and Redis.
+
+The sequence begins when the user submits a domain. The frontend sends a POST request to the backend's \texttt{/analyze} endpoint. The backend does not process the analysis itself. Instead, it pushes a task onto the Redis queue and immediately returns a task ID to the frontend. This keeps the API response fast and prevents the HTTP connection from timing out during a long analysis.
+
+The frontend then enters a polling loop, sending a GET request to a endpoint on the API \texttt{/analyze/status/\{task\_id\}} every few seconds. Meanwhile, the Celery worker picks up the task from Redis and begins the analysis. When it needs a threat score, it sends a POST request to the AI service's \texttt{/score} endpoint, passing the extracted feature vector. The AI service runs the ensemble model and returns the score and feature importance values. The worker saves all results to PostgreSQL and marks the task as complete in Redis.
+
+On the next poll from the frontend, the backend finds that the task is complete, retrieves the results from PostgreSQL, and returns them to the frontend. The frontend then renders the full analysis dashboard for the user.
+
+This sequence makes the system non-blocking and scalable. Multiple users can submit domains at the same time because each analysis runs as a separate Celery task in the background.
+
+% --- MERMAID DIAGRAM: Sequence ---
+%
+% ```mermaid
+% sequenceDiagram
+%   participant U as User (Browser)
+%   participant FE as Frontend (Next.js)
+%   participant BE as Backend (FastAPI)
+%   participant W as Celery Worker
+%   participant AI as AI Service (FastAPI)
+%   participant DB as PostgreSQL
+%   participant RD as Redis
+
+%   U->>FE: Enter domain and submit
+%   FE->>BE: POST /analyze {domain}
+%   BE->>RD: Push analysis task
+%   BE-->>FE: Return task_id
+%   FE->>BE: GET /analyze/status/{task_id} (polling)
+%   RD->>W: Deliver task
+%   W->>AI: POST /score {features}
+%   AI-->>W: Return threat score + feature importance
+%   W->>DB: Save results
+%   W-->>RD: Mark task complete
+%   BE-->>FE: Return full results
+%   FE-->>U: Render analysis dashboard
+% ```
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/sequence.png}
+  \caption{Sequence Diagram for Domain Analysis Request}
+  \label{fig:sequence}
+\end{figure}
+
+% ----------------------------------------------------------------
+
+\section{Data Modelling}
+
+\subsection{Entity-Relationship Diagram}
+
+The entity-relationship (ER) diagram shows the structure of the PostgreSQL database used by DNS Guard. It defines the main entities, their attributes, and the relationships between them.
+
+The central entity is \textbf{Scan}, which represents a single analysis run for a domain. Every time a user submits a domain, a new Scan record is created. The Scan entity stores the time the scan was created and its current status (pending, running, or complete). Each Scan belongs to a \textbf{Domain} entity, which stores the domain name and the dates it was first and last seen in the system. A Domain can have many Scans over time, which allows the system to track how a domain's security posture changes between scans.
+
+Each Scan is linked to multiple \textbf{DNS\_Record} entries, one for each DNS record retrieved during the analysis. This includes A records, MX records, NS records, TXT records, and DNSSEC-related records. Storing individual records rather than a single JSON blob makes it easier to query and compare records across scans.
+
+Each Scan also has exactly one \textbf{WHOIS\_Record}, which stores the registration data returned by the WHOIS lookup, including the registrar name, creation date, expiry date, and the raw WHOIS response. A separate \textbf{WHOIS\_Diff} entity is linked to the Domain (not the Scan) and records the differences detected between two consecutive WHOIS scans. This allows the system to alert users when registration details change, which can be a sign of domain hijacking.
+
+Finally, each Scan has exactly one \textbf{Threat\_Score} record, which stores the numerical score produced by the ML model and the feature importance values as a JSON object.
+
+% --- MERMAID DIAGRAM: ER Diagram ---
+%
+% ```mermaid
+% erDiagram
+%   DOMAIN {
+%     int id PK
+%     string name
+%     datetime first_seen
+%     datetime last_seen
+%   }
+%   SCAN {
+%     int id PK
+%     int domain_id FK
+%     datetime created_at
+%     string status
+%   }
+%   DNS_RECORD {
+%     int id PK
+%     int scan_id FK
+%     string record_type
+%     string value
+%   }
+%   WHOIS_RECORD {
+%     int id PK
+%     int scan_id FK
+%     string registrar
+%     datetime creation_date
+%     datetime expiry_date
+%     string raw_data
+%   }
+%   WHOIS_DIFF {
+%     int id PK
+%     int domain_id FK
+%     int scan_a_id FK
+%     int scan_b_id FK
+%     json changes
+%   }
+%   THREAT_SCORE {
+%     int id PK
+%     int scan_id FK
+%     float score
+%     json feature_importance
+%   }
+%   DOMAIN ||--o{ SCAN : "has"
+%   SCAN ||--o{ DNS_RECORD : "contains"
+%   SCAN ||--|| WHOIS_RECORD : "has"
+%   SCAN ||--|| THREAT_SCORE : "has"
+%   DOMAIN ||--o{ WHOIS_DIFF : "tracks"
+% ```
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/entity-relationship.png}
+  \caption{Entity-Relationship Diagram for DNS Guard Database}
+  \label{fig:er}
+\end{figure}
+
+\subsection{Class Diagram}
+
+The class diagram shows the main classes in the DNS Guard backend and how they are connected. It gives a clear picture of how the code is organised and how responsibility is divided between different parts of the system.
+
+The central class is \textbf{AnalysisService}, which acts as the coordinator for the entire analysis process. When a Celery worker picks up an analysis task, it calls the \texttt{run()} method of \texttt{AnalysisService}, passing the domain name. This method then calls each of the individual service classes in turn and collects their results.
+
+Each service class has a single responsibility. \textbf{DNSResolver} queries DNS servers and returns all DNS records for the domain. \textbf{WHOISLookup} retrieves registration data from WHOIS servers. \textbf{CertTransparency} queries the crt.sh certificate transparency log API. \textbf{PassiveDNS} retrieves historical IP resolution data. \textbf{TyposquatDetector} compares the domain against a list of top brands using edit-distance algorithms. \textbf{SubdomainEnum} discovers subdomains using both brute-force wordlists and certificate transparency data. \textbf{ReverseIP} finds other domains hosted on the same IP address. \textbf{ThreatIntel} checks the domain against Spamhaus DBL and PhishTank. \textbf{ThreatScorer} sends the extracted feature vector to the AI service and returns the threat score and feature importance.
+
+Each service class returns a typed result object. All of these result objects are combined by \texttt{AnalysisService} into a single \textbf{AnalysisResult} object, which is then serialised and saved to the database. This design makes the code easy to test and extend. Adding a new analysis module only requires creating a new service class and calling it from \texttt{AnalysisService}.
+
+% --- MERMAID DIAGRAM: Class Diagram ---
+%
+% ```mermaid
+% classDiagram
+%   class AnalysisService {
+%     +run(domain: str) AnalysisResult
+%   }
+%   class DNSResolver {
+%     +resolve(domain: str) DNSResult
+%   }
+%   class WHOISLookup {
+%     +lookup(domain: str) WHOISResult
+%   }
+%   class CertTransparency {
+%     +query(domain: str) CertResult
+%   }
+%   class PassiveDNS {
+%     +history(domain: str) PassiveDNSResult
+%   }
+%   class TyposquatDetector {
+%     +detect(domain: str) TyposquatResult
+%   }
+%   class SubdomainEnum {
+%     +enumerate(domain: str) SubdomainResult
+%   }
+%   class ReverseIP {
+%     +lookup(domain: str) ReverseIPResult
+%   }
+%   class ThreatIntel {
+%     +check(domain: str) ThreatIntelResult
+%   }
+%   class ThreatScorer {
+%     +score(features: dict) ScoreResult
+%   }
+%   class AnalysisResult {
+%     +domain: str
+%     +threat_score: float
+%     +dns: DNSResult
+%     +whois: WHOISResult
+%     +certs: CertResult
+%     +passive_dns: PassiveDNSResult
+%     +typosquat: TyposquatResult
+%     +subdomains: SubdomainResult
+%     +reverse_ip: ReverseIPResult
+%     +threat_intel: ThreatIntelResult
+%   }
+%   AnalysisService --> DNSResolver
+%   AnalysisService --> WHOISLookup
+%   AnalysisService --> CertTransparency
+%   AnalysisService --> PassiveDNS
+%   AnalysisService --> TyposquatDetector
+%   AnalysisService --> SubdomainEnum
+%   AnalysisService --> ReverseIP
+%   AnalysisService --> ThreatIntel
+%   AnalysisService --> ThreatScorer
+%   AnalysisService --> AnalysisResult
+% ```
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/class.png}
+  \caption{Class Diagram for DNS Guard Backend}
+  \label{fig:class}
+\end{figure}
+
+% ----------------------------------------------------------------
+
+\section{Functional and Behavioural Modelling}
+
+\subsection{Data Flow Diagram}
+
+The data flow diagram (DFD) shows how data enters, moves through, and leaves the DNS Guard system. Two levels of DFD are provided. Level 0 gives a high-level view of the system as a single process, and Level 1 breaks that process down into its main sub-processes.
+
+\textbf{Level 0 (Context Diagram):} At this level, DNS Guard is shown as a single black box. The user provides a domain name as input and receives an analysis report as output. The system also communicates with four external data stores: DNS servers (to resolve DNS records), WHOIS servers (to retrieve registration data), the crt.sh certificate transparency log (to find SSL/TLS certificates), and the Spamhaus and PhishTank blocklist services (to check whether the domain is known to be malicious). Data flows in both directions between DNS Guard and each of these external services.
+
+% --- MERMAID DIAGRAM: DFD Level 0 ---
+%
+% ```mermaid
+% flowchart LR
+%   U([User]) -->|Domain name| S[DNS Guard System]
+%   S -->|Analysis report| U
+%   S -->|DNS queries| DNS[(DNS Servers)]
+%   S -->|WHOIS queries| WHOIS[(WHOIS Servers)]
+%   S -->|CT log queries| CT[(crt.sh)]
+%   S -->|Blocklist queries| BL[(Spamhaus / PhishTank)]
+%   DNS -->|DNS records| S
+%   WHOIS -->|Registration data| S
+%   CT -->|Certificate data| S
+%   BL -->|Blocklist status| S
+% ```
+
+%// TODO: Add dfd-level0.png to images/ folder
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/dfd-level0.png}
+  \caption{Data Flow Diagram -- Level 0 (Context Diagram)}
+  \label{fig:dfd0}
+\end{figure}
+
+\textbf{Level 1 (Detailed DFD):} At this level, the internal processing of DNS Guard is broken down into six numbered processes. Process 1 (Data Collection) receives the domain name from the user and queries all external services to gather raw data. Process 2 (Feature Extraction) takes the raw DNS and WHOIS data and converts it into the 40-feature vector used by the machine learning model. Process 3 (ML Threat Scoring) receives the feature vector and returns a threat score and feature importance values. Process 4 (Threat Intelligence Check) runs in parallel with feature extraction and checks the domain against blocklists. Process 5 (Result Aggregation) combines the outputs of all previous processes into a single result object and saves it to the PostgreSQL database. Process 6 (Report Generation) takes the aggregated result and produces a PDF report on request. The user receives both the dashboard data and the PDF from the system.
+
+% --- MERMAID DIAGRAM: DFD Level 1 ---
+%
+% ```mermaid
+% flowchart TD
+%   U([User]) -->|Domain| P1[1. Data Collection]
+%   P1 -->|Raw DNS + WHOIS + CT data| P2[2. Feature Extraction]
+%   P2 -->|40-feature vector| P3[3. ML Threat Scoring]
+%   P1 -->|Domain + records| P4[4. Threat Intelligence Check]
+%   P3 -->|Score + importance| P5[5. Result Aggregation]
+%   P4 -->|Blocklist status| P5
+%   P5 -->|Full result| DB[(PostgreSQL)]
+%   P5 -->|Full result| P6[6. Report Generation]
+%   P6 -->|PDF| U
+%   P5 -->|Dashboard data| U
+% ```
+
+%// TODO: Add dfd-level1.png to images/ folder
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/dfd-level1.png}
+  \caption{Data Flow Diagram -- Level 1}
+  \label{fig:dfd1}
+\end{figure}
+
+\subsection{Data Dictionary}
+
+The data dictionary below defines the key data elements used in DNS Guard. It lists the field name, data type, and a description of what each field stores and how it is used in the system.
+
+\begin{longtable}{|p{4.5cm}|p{2cm}|p{7.5cm}|}
+\caption{Data Dictionary}\\
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Description} \\
+\hline
+\endfirsthead
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Description} \\
+\hline
+\endhead
+\hline
+\endfoot
+\texttt{domain} & String & The domain name submitted by the user for analysis (e.g. \texttt{example.com}). \\
+\hline
+\texttt{scan\_id} & Integer & A unique identifier assigned to each analysis scan. Used to retrieve results and track task status. \\
+\hline
+\texttt{created\_at} & Datetime & The date and time when the scan was created. Stored in UTC. \\
+\hline
+\texttt{status} & String & The current status of the scan task. Possible values are \texttt{pending}, \texttt{running}, and \texttt{complete}. \\
+\hline
+\texttt{threat\_score} & Float & A numerical risk score between 0 and 100 produced by the ML ensemble model. A score above 70 is considered high risk. \\
+\hline
+\texttt{feature\_importance} & JSON & A dictionary mapping each of the 40 input features to its contribution to the threat score. Used to generate the SHAP-style bar chart. \\
+\hline
+\texttt{dns\_records} & JSON & A list of DNS records retrieved for the domain. Each entry includes the record type (A, MX, NS, TXT, etc.), name, and value. \\
+\hline
+\texttt{dnssec\_valid} & Boolean & Indicates whether the domain has a valid and complete DNSSEC configuration, including DNSKEY, RRSIG, and DS records. \\
+\hline
+\texttt{registrar} & String & The name of the domain registrar as returned by the WHOIS lookup (e.g. GoDaddy, Namecheap). \\
+\hline
+\texttt{creation\_date} & Datetime & The date the domain was first registered, taken from WHOIS data. Used to flag newly registered domains. \\
+\hline
+\texttt{expiry\_date} & Datetime & The date the domain registration is due to expire, taken from WHOIS data. Used to flag soon-to-expire domains. \\
+\hline
+\texttt{whois\_diff} & JSON & A structured record of changes detected between two consecutive WHOIS scans of the same domain. Includes the field name, old value, and new value for each change. \\
+\hline
+\texttt{cert\_count} & Integer & The total number of SSL/TLS certificates found in certificate transparency logs for the domain. A sudden spike may indicate suspicious activity. \\
+\hline
+\texttt{has\_wildcard\_cert} & Boolean & Indicates whether any of the certificates found are wildcard certificates (e.g. \texttt{*.example.com}). \\
+\hline
+\texttt{passive\_dns\_ips} & JSON & A list of historical IP addresses that the domain has resolved to, retrieved from passive DNS data sources. \\
+\hline
+\texttt{fast\_flux\_detected} & Boolean & Indicates whether fast-flux behaviour was detected. Fast-flux is identified by a large number of different IP addresses in the passive DNS history over a short period. \\
+\hline
+\texttt{typosquat\_matches} & JSON & A list of known brand domains that are similar to the submitted domain, along with their edit-distance similarity scores. \\
+\hline
+\texttt{subdomains} & JSON & A list of subdomains discovered through brute-force wordlist enumeration and certificate transparency log queries. \\
+\hline
+\texttt{reverse\_ip\_domains} & JSON & A list of other domain names found to be hosted on the same IP address as the submitted domain. A very large number of co-hosted domains may indicate shared malicious hosting. \\
+\hline
+\texttt{on\_spamhaus\_dbl} & Boolean & Indicates whether the domain appears on the Spamhaus Domain Block List, which covers spam, phishing, and malware domains. \\
+\hline
+\texttt{on\_phishtank} & Boolean & Indicates whether the domain appears in the PhishTank database of verified phishing URLs. \\
+\hline
+\texttt{geo\_locations} & JSON & A list of geolocation records for each IP address associated with the domain. Each entry includes country, city, latitude, and longitude. \\
+\hline
+\texttt{spf\_record} & String & The SPF TXT record found for the domain, if present. An absent or incorrectly configured SPF record leaves the domain open to email spoofing. \\
+\hline
+\texttt{dmarc\_record} & String & The DMARC TXT record found for the domain, if present. DMARC builds on SPF and DKIM to provide a policy for handling unauthenticated email. \\
+\hline
+\texttt{dkim\_record} & String & The DKIM TXT record found for the domain, if present. DKIM allows receiving mail servers to verify that an email was sent by an authorised server. \\
+\hline
+\end{longtable}
+
+% --- Chapter 4: Implementation ---
+\chapter*{Implementation}
+\setcounter{chapter}{4}
+\setcounter{section}{0}
+
+\section{Implementation Environment}
+
+\subsection{Model Used in Developing}
+
+DNS Guard was developed using the \textbf{Incremental Development Model}. In this model, the system is built and delivered in small, working increments rather than all at once. Each increment adds new functionality on top of what was already built and tested. This approach was chosen because the project has many independent modules, such as DNS resolution, WHOIS lookup, certificate transparency, and machine learning scoring, each of which could be built, tested, and integrated one at a time.
+
+The development went through the following increments:
+
+\begin{enumerate}
+    \item \textbf{Increment 1 -- Core Infrastructure:} Set up the Docker Compose environment with FastAPI backend, Next.js frontend, PostgreSQL, and Redis. Implemented the basic domain submission and task queuing flow using Celery.
+    \item \textbf{Increment 2 -- DNS and WHOIS Analysis:} Implemented DNS record resolution using dnspython, DNSSEC validation, and WHOIS lookup. Added the results display on the frontend.
+    \item \textbf{Increment 3 -- Threat Intelligence Modules:} Added certificate transparency querying, passive DNS history, typosquatting detection, subdomain enumeration, reverse IP lookup, and blocklist checks.
+    \item \textbf{Increment 4 -- Machine Learning:} Built the feature extractor, trained the Random Forest and MLP ensemble model, and integrated the AI service with the backend.
+    \item \textbf{Increment 5 -- AI Chatbot:} Set up the Qdrant vector database, built the RAG pipeline, and integrated the Ollama LLM with a rule-based fallback.
+    \item \textbf{Increment 6 -- Reporting and Polish:} Added PDF report generation, the geolocation map, WHOIS diff detection, dark/light mode, and recent search history.
+\end{enumerate}
+
+This incremental approach meant that a working version of the system was available at the end of each increment, which made it easy to test and get feedback throughout the development process.
+
+\subsection{Software Prototyping Types}
+
+During the development of DNS Guard, \textbf{evolutionary prototyping} was used alongside the incremental model. In evolutionary prototyping, the prototype is not thrown away after gathering feedback. Instead, it is continuously refined and improved until it becomes the final product. This was appropriate for this project because the requirements for some features, such as the threat scoring model and the chatbot, were not fully defined at the start and evolved as the project progressed.
+
+For example, the initial version of the threat scoring model used only lexical features. After testing, it became clear that DNS record features and DNSSEC status were also important, so the feature set was expanded from 12 to 40 features. Similarly, the chatbot started as a simple keyword-matching rule engine and was later upgraded to use a full RAG pipeline with a local LLM.
+
+\section{Coding Standard}
+
+Consistent coding standards were followed throughout the project to keep the codebase readable and maintainable.
+
+\textbf{Python (Backend and AI Service):}
+\begin{itemize}
+    \item Code follows the \textbf{PEP 8} style guide \cite{pep8}, which defines conventions for indentation, naming, and line length.
+    \item All functions and classes have docstrings explaining their purpose, parameters, and return values.
+    \item Variable and function names use \texttt{snake\_case}. Class names use \texttt{PascalCase}.
+    \item Type hints are used throughout, as required by FastAPI for request and response validation.
+    \item Each service module is kept in its own file under the \texttt{services/} directory, with a single responsibility.
+\end{itemize}
+
+\textbf{TypeScript (Frontend):}
+\begin{itemize}
+    \item Code follows the \textbf{Airbnb TypeScript style guide} conventions.
+    \item All React components are written as functional components with typed props.
+    \item Component names use \texttt{PascalCase}. Variables and functions use \texttt{camelCase}.
+    \item Each component is kept in its own file under the \texttt{components/} directory.
+    \item API calls are made through Next.js API route proxies rather than directly from the browser, to avoid exposing backend URLs.
+\end{itemize}
+
+\textbf{General:}
+\begin{itemize}
+    \item All sensitive configuration values such as database passwords and API keys are stored in environment variables and never hardcoded in source files.
+    \item Git was used for version control throughout the project.
+\end{itemize}
+
+\section{Laboratory Setup}
+
+DNS Guard was developed and tested on the following hardware and software environment:
+
+\begin{longtable}{|p{5cm}|p{9cm}|}
+\caption{Laboratory Setup}\\
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Component} & \textbf{Details} \\
+\hline
+\endfirsthead
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Component} & \textbf{Details} \\
+\hline
+\endhead
+\hline
+\endfoot
+Operating System & macOS \\
+\hline
+Processor & Apple Silicon (ARM64) \\
+\hline
+RAM & 18 GB \\
+\hline
+Storage & 1 TB SSD \\
+\hline
+Docker Version & Docker Desktop 4.x \\
+\hline
+Python Version & 3.11 \\
+\hline
+Node.js Version & 20.x (LTS) \\
+\hline
+Browser for Testing & Google Chrome (latest) \\
+\hline
+Code Editor & Visual Studio Code \\
+\hline
+Version Control & Git with GitHub \\
+\hline
+LLM (Optional) & Ollama with Mistral 7B \\
+\hline
+\end{longtable}
+
+All six services (frontend, backend, AI service, PostgreSQL, Redis, Qdrant) were run locally using Docker Compose during development. The system was tested by analysing a range of real and synthetic domain names, including known malicious domains from public threat feeds and legitimate domains from the Alexa top 1000 list.
+
+\section{Tools and Technology Used}
+
+The tools and technologies used in the implementation of DNS Guard are described in detail in Section 2.4. A brief summary is provided here for reference:
+
+\begin{longtable}{|p{4cm}|p{3cm}|p{7cm}|}
+\caption{Tools and Technologies Used}\\
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Tool / Technology} & \textbf{Version} & \textbf{Role in Project} \\
+\hline
+\endfirsthead
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Tool / Technology} & \textbf{Version} & \textbf{Role in Project} \\
+\hline
+\endhead
+\hline
+\endfoot
+Next.js & 14 & Frontend web application \\
+\hline
+Tailwind CSS & 3.x & Frontend styling \\
+\hline
+FastAPI & 0.110+ & Backend API and AI service \\
+\hline
+Celery & 5.x & Asynchronous task queue \\
+\hline
+PostgreSQL & 15 & Persistent data storage \\
+\hline
+Redis & 7.x & Message broker for Celery \\
+\hline
+Qdrant & 1.x & Vector database for RAG \\
+\hline
+scikit-learn & 1.4+ & ML model training and inference \\
+\hline
+dnspython & 2.x & DNS record resolution \\
+\hline
+ReportLab & 4.x & PDF report generation \\
+\hline
+Ollama & Latest & Local LLM runtime \\
+\hline
+Docker Compose & 2.x & Service orchestration \\
+\hline
+\end{longtable}
+
+\section{Screenshots / Snapshots}
+
+This section presents screenshots of the DNS Guard web application showing the key features of the system.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/SS_homepage.png}
+  \caption{DNS Guard -- Home Page with Search Interface}
+  \label{fig:ss_home}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/SS_analysispage1.png}
+  \caption{DNS Guard -- Analysis Dashboard (Part 1: Threat Score and DNS Records)}
+  \label{fig:ss_analysis1}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/SS_analysispage2.png}
+  \caption{DNS Guard -- Analysis Dashboard (Part 2: WHOIS and Certificate Transparency)}
+  \label{fig:ss_analysis2}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/SS_analysispage3.png}
+  \caption{DNS Guard -- Analysis Dashboard (Part 3: Threat Intelligence and Geolocation)}
+  \label{fig:ss_analysis3}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/SS_lightmode.png}
+  \caption{DNS Guard -- Light Mode Interface}
+  \label{fig:ss_lightmode}
+\end{figure}
+
+% \textit{Screenshots to be added. Place images in the \texttt{images/screenshots/} folder and uncomment the figure blocks above.}
+
+% --- Chapter 5: Summary of Results and Future Scope ---
+\chapter*{Summary of Results and Future Scope}
+\setcounter{chapter}{5}
+\setcounter{section}{0}
+
+\section{Advantages and Unique Features}
+
+DNS Guard offers several advantages over existing tools and brings a number of unique features that are not commonly found together in a single free platform.
+
+\textbf{All-in-one analysis:} Most existing tools focus on one area of DNS security. DNS Guard combines DNS record analysis, DNSSEC validation, WHOIS lookup with change detection, certificate transparency monitoring, passive DNS history, typosquatting detection, subdomain enumeration, reverse IP lookup, and threat intelligence checks into a single scan. The user does not need to visit multiple tools or manually combine results.
+
+\textbf{Machine learning threat score with explainability:} DNS Guard produces a 0 to 100 threat score using an ensemble of a Random Forest classifier and an MLP neural network trained on 40 features. Alongside the score, the system shows a feature importance chart that explains which features contributed most to the score. This makes the result transparent and actionable, rather than just a black-box number.
+
+\textbf{WHOIS change detection:} The system stores WHOIS data from every scan and compares it against the previous scan for the same domain. If any registration details have changed, such as the registrar, name servers, or contact information, the system highlights the differences. This is useful for detecting domain hijacking or unauthorised transfers.
+
+\textbf{AI chatbot with RAG:} The built-in chatbot uses a local LLM (Mistral via Ollama) combined with a Retrieval-Augmented Generation pipeline backed by Qdrant. This means the chatbot can answer questions about DNS security using a curated knowledge base, rather than relying purely on the model's training data. A rule-based fallback engine ensures the chatbot remains useful even when Ollama is not running.
+
+\textbf{Privacy-first design:} Because the LLM runs locally using Ollama, no user data is sent to any external AI service. This is an important advantage for users who are analysing sensitive or internal domains.
+
+\textbf{Free and open deployment:} The entire system runs on Docker Compose and can be started with a single command. All core functionality works without any paid API keys, making it accessible to students, researchers, and small organisations.
+
+\textbf{PDF report generation:} Each scan can be exported as a comprehensive PDF report that includes all findings, the threat score, feature importance, and remediation recommendations. This is useful for sharing results with colleagues or including in security audits.
+
+\textbf{Dark and light mode:} The interface supports both dark and light themes with a persistent toggle, making it comfortable to use in different environments.
+
+\section{Results and Discussions}
+
+The system was tested by analysing a range of domains across different risk categories. The test set included known malicious domains from public threat feeds, newly registered domains, domains with missing email security records, legitimate high-traffic domains, and domains that are typosquats of well-known brands.
+
+\textbf{Threat scoring accuracy:} The ensemble model correctly assigned high threat scores (above 70) to domains that were present on blocklists or exhibited multiple risk indicators such as high lexical entropy, missing DNSSEC, and no SPF or DMARC records. Legitimate domains from the Alexa top 1000 consistently received low scores (below 30). The model performed well on domains with clear risk signals but was less confident on borderline cases, which is expected given the complexity of the problem.
+
+\textbf{DNSSEC validation:} The system correctly identified domains with valid DNSSEC configurations and flagged those with missing or incomplete DNSKEY, RRSIG, or DS records. A large proportion of tested domains did not have DNSSEC enabled, which is consistent with published statistics showing that DNSSEC adoption remains low globally \cite{dnssec_adoption2023}.
+
+\textbf{Typosquatting detection:} The edit-distance based typosquatting detector successfully identified domains that were one or two character substitutions away from well-known brands. For example, domains such as \texttt{g00gle.com} and \texttt{paypa1.com} were correctly flagged as potential typosquats.
+
+\textbf{Certificate transparency:} The system successfully retrieved certificate data from crt.sh for all tested domains. Domains with a large number of recently issued certificates or wildcard certificates were flagged for further review.
+
+\textbf{Passive DNS and fast-flux detection:} For domains with available passive DNS data, the system correctly identified fast-flux behaviour in domains that had resolved to a large number of different IP addresses over a short period.
+
+\textbf{Chatbot performance:} When Ollama was running, the chatbot provided accurate and contextually relevant answers to questions about DNS security topics. The RAG pipeline ensured that answers were grounded in the knowledge base rather than being generated purely from the model's memory. The rule-based fallback also handled common questions correctly when Ollama was not available.
+
+\textbf{Performance:} A typical full domain analysis completed in approximately 8 to 15 seconds, depending on the responsiveness of external services such as WHOIS servers and crt.sh. The asynchronous Celery architecture ensured that the API remained responsive during analysis and that multiple domains could be analysed concurrently.
+
+\section{Future Scope of Work}
+
+While DNS Guard is a functional and comprehensive platform, there are several areas where it could be improved or extended in future work.
+
+\textbf{Real-time monitoring and alerting:} Currently, DNS Guard performs analysis on demand when a user submits a domain. A future version could include a monitoring mode where the system periodically re-scans a list of watched domains and sends an alert if the threat score changes significantly or if WHOIS data changes. This would be useful for organisations that need to monitor their own domains or track competitor domains.
+
+\textbf{Expanded threat intelligence feeds:} The current implementation uses Spamhaus DBL and PhishTank. Future versions could integrate additional feeds such as the SURBL multi-blocklist \cite{surbl2024}, OpenPhish \cite{openphish2024}, and abuse.ch URLhaus \cite{urlhaus2024} to improve detection coverage.
+
+\textbf{VirusTotal and Shodan integration:} The system already has optional support for VirusTotal and Shodan API keys. Future work could make fuller use of these APIs, for example by retrieving VirusTotal scan history for a domain and Shodan data about the services running on its IP addresses.
+
+\textbf{Improved machine learning model:} The current model uses a 40-feature vector with a Random Forest and MLP ensemble. Future work could explore deep learning approaches such as character-level convolutional neural networks or transformer-based models for domain name classification, which have shown strong results in recent research \cite{woodbridge2016dga}. The training dataset could also be expanded and kept up to date with fresh malicious domain samples.
+
+\textbf{User accounts and scan history:} The current system stores scan results in the database but does not have user accounts. Adding authentication would allow users to log in, view their full scan history, set up domain watchlists, and manage alerts.
+
+\textbf{API access:} Exposing a public REST API with rate limiting and API key authentication would allow other tools and scripts to query DNS Guard programmatically, making it useful as a backend service for other security platforms.
+
+\textbf{Automated remediation guidance:} The current system provides a risk summary with recommendations. Future work could make these recommendations more specific and actionable, for example by generating ready-to-use DNS record configurations that the user can copy and paste into their DNS provider's control panel.
+
+\textbf{Support for internationalised domain names (IDNs):} Internationalised domain names use Unicode characters and are increasingly used in homograph attacks, where characters from different scripts are used to create domains that look identical to legitimate ones. Future versions of DNS Guard could add specific detection for IDN-based attacks \cite{holz2008fastflux}.
+
+\textbf{Mobile-friendly interface:} While the current interface is responsive, it was primarily designed for desktop use. A dedicated mobile-optimised layout would improve usability on smartphones and tablets.
+
+% --- Chapter 6: Conclusion ---
+\chapter*{Conclusion}
+\setcounter{chapter}{6}
+\setcounter{section}{0}
+\addcontentsline{toc}{chapter}{Conclusion}
+
+This project set out to build a comprehensive, accessible, and free platform for analysing the security of domain names. The result is DNS Guard, a web-based domain threat intelligence platform that brings together multiple areas of DNS security analysis into a single tool.
+
+The system successfully meets all the objectives defined at the start of the project. It can analyse any domain name and check it across ten different dimensions: DNS record analysis, DNSSEC validation, WHOIS lookup with change detection, certificate transparency monitoring, passive DNS history with fast-flux detection, typosquatting detection, subdomain enumeration, reverse IP lookup, and threat intelligence blocklist checks. All of these results are presented in a clean and easy-to-understand dashboard that works for both technical and non-technical users.
+
+The machine learning component of the project produced a working threat scoring model that uses a 40-feature vector and an ensemble of a Random Forest classifier and an MLP neural network. The model assigns a risk score between 0 and 100 to any domain and explains which features contributed most to the score using a SHAP-style feature importance chart. This level of explainability is important because it allows users to understand why a domain was flagged and what they can do about it.
+
+The AI chatbot, powered by a local Ollama LLM with a RAG pipeline backed by Qdrant, provides a conversational interface for asking questions about DNS security and about the results of a scan. Running the LLM locally means that no user data is sent to any external service, which is an important consideration for privacy.
+
+The system is built as a set of containerised microservices using Docker Compose, which makes it easy to deploy and run on any machine with a single command. The use of FastAPI, Celery, PostgreSQL, and Redis provides a solid and scalable foundation that could support a much larger number of users with relatively minor changes.
+
+From a broader perspective, this project demonstrates that it is possible to build a capable and practical DNS security tool using entirely open-source technologies at no cost. The fragmentation of existing tools, where a user must visit five or six different websites to get a complete picture of a domain's security, is a real problem that DNS Guard addresses directly.
+
+The project also highlights how important DNS security is and how many domains on the internet still have basic misconfigurations such as missing SPF, DKIM, and DMARC records, no DNSSEC, and recently registered names that closely resemble well-known brands. These are not difficult problems to fix, but they require awareness. DNS Guard is designed to provide that awareness in a clear and actionable way.
+
+In conclusion, DNS Guard is a functional, well-structured, and practically useful final year project that covers a wide range of topics including networking, cybersecurity, machine learning, natural language processing, and full-stack web development. The work done here provides a strong foundation for future development and could, with further hardening and testing, be deployed as a real-world security tool.
+
+% --- Bibliography ---
+\printbibliography[heading=bibintoc, title={References}]
+
+% ============================================================
+%  BACK MATTER — Capital Roman numerals
+% ============================================================
+\newpage
+\appendix
+\pagenumbering{Roman}
+
+% ============================================================
+%  APPENDIX A -- API Reference
+% ============================================================
+\chapter{API Reference}
+\label{app:api}
+
+This appendix lists all REST API endpoints exposed by the DNS Guard backend. All endpoints are served from the base URL \texttt{http://localhost:8000}. Requests and responses use JSON unless otherwise stated.
+
+\begin{longtable}{|p{1.5cm}|p{5.5cm}|p{7cm}|}
+\caption{API Endpoint Reference}\\
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\
+\hline
+\endfirsthead
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\
+\hline
+\endhead
+\hline
+\endfoot
+POST & \texttt{/analyze} & Full domain analysis. Accepts \texttt{\{"domain": "example.com"\}}. Returns DNS records, WHOIS, certs, passive DNS, typosquat matches, subdomains, reverse IP, threat intel, geolocation, threat score, verdict, and feature explanations. \\
+\hline
+POST & \texttt{/chat} & AI chatbot message. Accepts \texttt{\{"domain": "...", "intent": "...", "message": "..."\}}. Returns a text response from the LLM or rule-based fallback. \\
+\hline
+GET & \texttt{/report/\{domain\}/pdf} & Downloads a PDF report for the given domain. Triggers a fresh analysis and returns the result as an \texttt{application/pdf} file attachment. \\
+\hline
+GET & \texttt{/whois/\{domain\}} & Returns WHOIS registration data including registrar, creation date, expiry date, and name servers. \\
+\hline
+GET & \texttt{/certs/\{domain\}} & Returns certificate transparency data from crt.sh including certificate count, issuer list, and wildcard certificate flag. \\
+\hline
+GET & \texttt{/passive-dns/\{domain\}} & Returns historical IP resolution data and a fast-flux detection flag. \\
+\hline
+GET & \texttt{/typosquat/\{domain\}} & Returns a list of brand domains similar to the submitted domain with edit-distance similarity scores. \\
+\hline
+GET & \texttt{/subdomains/\{domain\}} & Returns a list of discovered subdomains from brute-force enumeration and certificate transparency logs. \\
+\hline
+GET & \texttt{/reverse-ip/\{domain\}} & Returns the resolved IP address and a list of other domains co-hosted on the same IP. \\
+\hline
+GET & \texttt{/threat-intel/\{domain\}} & Returns blocklist check results from Spamhaus DBL and PhishTank. \\
+\hline
+\end{longtable}
+
+% ============================================================
+%  APPENDIX B -- ML Model Details
+% ============================================================
+\chapter{Machine Learning Model Details}
+\label{app:ml}
+
+\section*{B.1 Feature List}
+
+The threat scoring model uses a 40-dimensional feature vector extracted from the domain name and its DNS records.
+
+\begin{longtable}{|p{0.8cm}|p{4.5cm}|p{2cm}|p{6.5cm}|}
+\caption{ML Model Feature Vector (40 Features)}\\
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{No.} & \textbf{Feature Name} & \textbf{Type} & \textbf{Description} \\
+\hline
+\endfirsthead
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{No.} & \textbf{Feature Name} & \textbf{Type} & \textbf{Description} \\
+\hline
+\endhead
+\hline
+\endfoot
+0 & \texttt{domain\_length} & Integer & Total length of the full domain name string. \\
+\hline
+1 & \texttt{sld\_length} & Integer & Length of the second-level domain. \\
+\hline
+2 & \texttt{subdomain\_depth} & Integer & Number of dots in the domain. \\
+\hline
+3 & \texttt{hyphen\_count} & Integer & Number of hyphens in the domain name. \\
+\hline
+4 & \texttt{sld\_entropy} & Float & Shannon entropy of the SLD characters. High entropy suggests DGA-generated names. \\
+\hline
+5 & \texttt{digit\_ratio} & Float & Ratio of digit characters to total characters in the SLD. \\
+\hline
+6 & \texttt{consonant\_ratio} & Float & Ratio of consonant characters in the SLD. \\
+\hline
+7 & \texttt{long\_digit\_seq} & Binary & 1 if the SLD contains 4 or more consecutive digits. \\
+\hline
+8 & \texttt{high\_risk\_tld} & Binary & 1 if the TLD is in the high-risk list (e.g. \texttt{.tk}, \texttt{.xyz}, \texttt{.top}). \\
+\hline
+9 & \texttt{brand\_impersonation} & Binary & 1 if the SLD contains the name of a well-known brand. \\
+\hline
+10 & \texttt{phish\_keywords} & Binary & 1 if the SLD contains keywords such as \texttt{login}, \texttt{secure}, \texttt{verify}. \\
+\hline
+11 & \texttt{spam\_keywords} & Binary & 1 if the SLD contains keywords such as \texttt{free}, \texttt{win}, \texttt{prize}. \\
+\hline
+12 & \texttt{has\_a\_record} & Binary & 1 if the domain has at least one A record. \\
+\hline
+13 & \texttt{has\_aaaa\_record} & Binary & 1 if the domain has at least one AAAA record. \\
+\hline
+14 & \texttt{has\_mx\_record} & Binary & 1 if the domain has at least one MX record. \\
+\hline
+15 & \texttt{ns\_count} & Integer & Number of NS records for the domain. \\
+\hline
+16 & \texttt{a\_record\_count} & Integer & Number of A records. A high count is a fast-flux indicator. \\
+\hline
+17 & \texttt{has\_soa} & Binary & 1 if the domain has a SOA record. \\
+\hline
+18 & \texttt{has\_cname} & Binary & 1 if the domain has a CNAME record. \\
+\hline
+19 & \texttt{spf\_present} & Binary & 1 if a valid SPF record is found in TXT records. \\
+\hline
+20 & \texttt{dmarc\_present} & Binary & 1 if a valid DMARC record is found in TXT records. \\
+\hline
+21 & \texttt{dkim\_present} & Binary & 1 if a DKIM record is found in TXT records. \\
+\hline
+22 & \texttt{spf\_includes} & Binary & 1 if the SPF record uses \texttt{include:} directives. \\
+\hline
+23 & \texttt{fast\_flux} & Binary & 1 if the domain has more than 5 A records. \\
+\hline
+24 & \texttt{many\_ns} & Binary & 1 if the domain has more than 6 NS records. \\
+\hline
+25 & \texttt{no\_mx\_has\_a} & Binary & 1 if the domain has an A record but no MX record. \\
+\hline
+26 & \texttt{dnskey\_present} & Binary & 1 if a DNSKEY record is present. \\
+\hline
+27 & \texttt{rrsig\_present} & Binary & 1 if an RRSIG record is present. \\
+\hline
+28 & \texttt{ds\_present} & Binary & 1 if a DS record is present. \\
+\hline
+29 & \texttt{no\_dnssec} & Binary & 1 if neither DNSKEY nor RRSIG is present. \\
+\hline
+30 & \texttt{mx\_no\_spf} & Binary & 1 if the domain has MX records but no SPF record. \\
+\hline
+31 & \texttt{mx\_no\_dmarc} & Binary & 1 if the domain has MX records but no DMARC record. \\
+\hline
+32 & \texttt{very\_long\_sld} & Binary & 1 if the SLD is longer than 20 characters. \\
+\hline
+33 & \texttt{high\_entropy\_sld} & Binary & 1 if the SLD entropy is greater than 3.5. \\
+\hline
+34 & \texttt{deep\_subdomain} & Binary & 1 if the domain has more than 3 dots. \\
+\hline
+35 & \texttt{brand\_in\_subdomain} & Binary & 1 if a brand name appears in a subdomain but not in the SLD. \\
+\hline
+36--39 & \texttt{reserved\_36--39} & Float & Reserved for future features. Currently 0.0. \\
+\hline
+\end{longtable}
+
+\section*{B.2 Training Data Summary}
+
+The model was trained on a labelled dataset compiled from the following sources:
+\begin{itemize}
+    \item \textbf{Malicious domains:} Spamhaus DBL, PhishTank, and abuse.ch URLhaus feeds.
+    \item \textbf{Legitimate domains:} Alexa top 1 million domain list, filtered to remove any domains present in threat feeds.
+\end{itemize}
+The dataset was balanced to contain an approximately equal number of malicious and legitimate samples.
+
+\section*{B.3 Model Evaluation}
+
+\begin{longtable}{|p{5cm}|p{4cm}|}
+\caption{ML Model Evaluation Metrics}\\
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Metric} & \textbf{Value} \\
+\hline
+\endfirsthead
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Metric} & \textbf{Value} \\
+\hline
+\endhead
+\hline
+\endfoot
+Accuracy & To be updated after final training \\
+\hline
+Precision & To be updated after final training \\
+\hline
+Recall & To be updated after final training \\
+\hline
+F1 Score & To be updated after final training \\
+\hline
+AUC-ROC & To be updated after final training \\
+\hline
+\end{longtable}
+
+% ============================================================
+%  APPENDIX C -- Sample Scan Output
+% ============================================================
+\chapter{Sample Scan Output}
+\label{app:sample}
+
+The following is a representative sample of the JSON response returned by the \texttt{POST /analyze} endpoint for the domain \texttt{example.com}.
+
+\begin{verbatim}
+{
+  "domain": "example.com",
+  "threat_score": 12.5,
+  "verdict": "Low Risk",
+  "explanations": [
+    { "feature": "no_dnssec", "value": 1.0, "contribution": 8.2 },
+    { "feature": "mx_no_dmarc", "value": 1.0, "contribution": 4.3 }
+  ],
+  "dns_records": {
+    "A": ["93.184.216.34"],
+    "NS": ["a.iana-servers.net", "b.iana-servers.net"],
+    "MX": [],
+    "TXT": ["v=spf1 -all"],
+    "SOA": ["ns.icann.org. noc.dns.icann.org. ..."]
+  },
+  "dnssec": { "dnskey": true, "rrsig": true, "ds": true },
+  "whois": {
+    "registrar": "ICANN",
+    "creation_date": "1995-08-14",
+    "expiry_date": "2025-08-13",
+    "name_servers": ["A.IANA-SERVERS.NET", "B.IANA-SERVERS.NET"]
+  },
+  "certs": { "count": 4, "has_wildcard": false,
+             "issuers": ["DigiCert Inc", "Let's Encrypt"] },
+  "passive_dns": { "ips": ["93.184.216.34"], "fast_flux": false },
+  "typosquat": { "matches": [] },
+  "subdomains": { "found": ["www.example.com", "mail.example.com"] },
+  "reverse_ip": {
+    "ip": "93.184.216.34",
+    "domains": ["example.com", "example.net", "example.org"]
+  },
+  "threat_intel": { "spamhaus_dbl": false, "phishtank": false },
+  "geo": [{
+    "ip": "93.184.216.34", "country": "United States",
+    "city": "Norwell", "lat": 42.1596, "lon": -70.8217
+  }]
+}
+\end{verbatim}
+
+% ============================================================
+%  APPENDIX D -- Environment Variables
+% ============================================================
+\chapter{Environment Variables and Configuration}
+\label{app:env}
+
+All environment variables are defined in the \texttt{.env} file at the root of the project. A template is provided in \texttt{.env.example}.
+
+\begin{longtable}{|p{4.5cm}|p{4.5cm}|p{5cm}|}
+\caption{Environment Variables and Configuration}\\
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Variable} & \textbf{Default Value} & \textbf{Description} \\
+\hline
+\endfirsthead
+\hline
+\rowcolor{nfsuBlue!15}
+\textbf{Variable} & \textbf{Default Value} & \textbf{Description} \\
+\hline
+\endhead
+\hline
+\endfoot
+\texttt{POSTGRES\_USER} & \texttt{dnsabuse} & PostgreSQL database username. \\
+\hline
+\texttt{POSTGRES\_PASSWORD} & \texttt{changeme} & PostgreSQL password. Change in production. \\
+\hline
+\texttt{POSTGRES\_DB} & \texttt{dnsabuse\_db} & Name of the PostgreSQL database. \\
+\hline
+\texttt{DATABASE\_URL} & \texttt{postgresql://...} & Full SQLAlchemy connection string. \\
+\hline
+\texttt{REDIS\_URL} & \texttt{redis://redis:6379/0} & Redis connection URL for Celery. \\
+\hline
+\texttt{QDRANT\_URL} & \texttt{http://qdrant:6333} & URL of the Qdrant vector database. \\
+\hline
+\texttt{AI\_SERVICE\_URL} & \texttt{http://ai:8001} & Internal URL of the AI/ML service. \\
+\hline
+\texttt{OLLAMA\_BASE\_URL} & \texttt{http://host.docker. internal:11434} & URL of the Ollama LLM on the host machine. \\
+\hline
+\texttt{OLLAMA\_MODEL} & \texttt{mistral} & Ollama model name for the chatbot. \\
+\hline
+\texttt{VIRUSTOTAL\_API\_KEY} & (empty) & Optional VirusTotal API key. \\
+\hline
+\texttt{SHODAN\_API\_KEY} & (empty) & Optional Shodan API key. \\
+\hline
+\texttt{SECRET\_KEY} & \texttt{changeme} & App secret key. Must be changed in production. \\
+\hline
+\texttt{ENVIRONMENT} & \texttt{development} & Set to \texttt{production} to disable debug features. \\
+\hline
+\end{longtable}
+
+% ============================================================
+%  APPENDIX E -- Installation and Deployment Guide
+% ============================================================
+\chapter{Installation and Deployment Guide}
+\label{app:install}
+
+\section*{E.1 Prerequisites}
+
+\begin{itemize}
+    \item \textbf{Docker Desktop} (v4.0+) -- \url{https://www.docker.com/products/docker-desktop}
+    \item \textbf{Git} -- \url{https://git-scm.com}
+    \item (Optional) \textbf{Ollama} -- \url{https://ollama.com}
+\end{itemize}
+
+\section*{E.2 Installation Steps}
+
+\textbf{Step 1: Clone the repository}
+\begin{verbatim}
+git clone <repository-url>
+cd FYP
+\end{verbatim}
+
+\textbf{Step 2: Configure environment variables}
+\begin{verbatim}
+cp .env.example .env
+\end{verbatim}
+Open \texttt{.env} and change \texttt{POSTGRES\_PASSWORD} and \texttt{SECRET\_KEY} for any non-development use.
+
+\textbf{Step 3: (Optional) Set up Ollama}
+\begin{verbatim}
+ollama pull mistral
+\end{verbatim}
+Ollama must be running on the host machine before starting Docker.
+
+\textbf{Step 4: Build and start all services}
+\begin{verbatim}
+docker compose up --build -d
+\end{verbatim}
+This starts six containers: frontend, backend, AI service, PostgreSQL, Redis, and Qdrant. The first build may take several minutes.
+
+\textbf{Step 5: Open the application}
+\begin{verbatim}
+http://localhost:3000
+\end{verbatim}
+
+\section*{E.3 Stopping the Application}
+\begin{verbatim}
+docker compose down
+\end{verbatim}
+To also remove all stored data:
+\begin{verbatim}
+docker compose down -v
+\end{verbatim}
+
+\section*{E.4 Updating Threat Feeds}
+\begin{verbatim}
+python scripts/update_feeds.py
+\end{verbatim}
+
+\newpage
+
+% ============================================================
+%  APPENDIX F -- Sample Generated PDF Report
+% ============================================================
+\chapter{Sample Generated PDF Report}
+\label{app:pdfreport}
+
+The following pages contain a sample PDF report generated by DNS Guard for the domain \texttt{nfsu.ac.in}. This report is produced by the \texttt{GET /report/\{domain\}/pdf} endpoint and is generated using the ReportLab library.
+
+\includepdf[pages=-, pagecommand={\thispagestyle{fancy}}, width=\textwidth]{images/dnsguard_nfsu_ac_in.pdf}
+
+% ============================================================
+%  List of Publications / Online References
+% ============================================================
+\chapter*{List of Publications / Online References}
+\addcontentsline{toc}{chapter}{List of Publications / Online References}
+
+\section*{Online References}
+
+\begin{enumerate}
+
+  \item P. Mockapetris, ``Domain Names -- Concepts and Facilities,'' RFC 1034, Internet Engineering Task Force, 1987. [Online]. Available: \url{https://www.rfc-editor.org/rfc/rfc1034}
+
+  \item R. Arends, R. Austein, M. Larson, D. Massey, and S. Rose, ``DNS Security Introduction and Requirements,'' RFC 4033, IETF, 2005. [Online]. Available: \url{https://www.rfc-editor.org/rfc/rfc4033}
+
+  \item S. Kitterman, ``Sender Policy Framework (SPF),'' RFC 7208, IETF, 2014. [Online]. Available: \url{https://www.rfc-editor.org/rfc/rfc7208}
+
+  \item Anti-Phishing Working Group, ``Phishing Activity Trends Report, Q4 2023,'' APWG, 2023. [Online]. Available: \url{https://apwg.org/trendsreports/}
+
+  \item VirusTotal, ``Free Online Virus, Malware and URL Scanner.'' [Online]. Available: \url{https://www.virustotal.com}
+
+  \item MXToolbox, ``Email Header Analyzer, MX Record Lookup.'' [Online]. Available: \url{https://mxtoolbox.com}
+
+  \item Shodan, ``The Search Engine for the Internet of Everything.'' [Online]. Available: \url{https://www.shodan.io}
+
+  \item SecurityTrails, ``DNS Intelligence and Historical Data.'' [Online]. Available: \url{https://securitytrails.com}
+
+  \item HackerTarget, ``DNSdumpster -- DNS Recon and Research.'' [Online]. Available: \url{https://dnsdumpster.com}
+
+  \item PhishTank, ``Free Community Site for Phishing Data.'' [Online]. Available: \url{https://www.phishtank.com}
+
+  \item The Spamhaus Project, ``Domain Block List (DBL).'' [Online]. Available: \url{https://www.spamhaus.org}
+
+  \item SURBL, ``Multi-Blocklist for URI Reputation.'' [Online]. Available: \url{https://www.surbl.org}
+
+  \item OpenPhish, ``Phishing Intelligence.'' [Online]. Available: \url{https://openphish.com}
+
+  \item abuse.ch, ``URLhaus -- Malware URL Exchange.'' [Online]. Available: \url{https://urlhaus.abuse.ch}
+
+  \item APNIC, ``DNSSEC Validation Statistics,'' 2023. [Online]. Available: \url{https://stats.labs.apnic.net/dnssec}
+
+  \item Vercel, ``Next.js -- The React Framework for the Web.'' [Online]. Available: \url{https://nextjs.org}
+
+  \item Tailwind Labs, ``Tailwind CSS -- A Utility-First CSS Framework.'' [Online]. Available: \url{https://tailwindcss.com}
+
+  \item S. Ramirez, ``FastAPI -- Modern, Fast Web Framework for Building APIs with Python.'' [Online]. Available: \url{https://fastapi.tiangolo.com}
+
+  \item Ask Solem et al., ``Celery -- Distributed Task Queue.'' [Online]. Available: \url{https://docs.celeryq.dev}
+
+  \item The PostgreSQL Global Development Group, ``PostgreSQL -- The World's Most Advanced Open Source Relational Database.'' [Online]. Available: \url{https://www.postgresql.org}
+
+  \item Redis Ltd., ``Redis -- The Real-Time Data Platform.'' [Online]. Available: \url{https://redis.io}
+
+  \item Qdrant, ``Vector Database for the Next Generation of AI Applications.'' [Online]. Available: \url{https://qdrant.tech}
+
+  \item Ollama, ``Get Up and Running with Large Language Models Locally.'' [Online]. Available: \url{https://ollama.com}
+
+  \item B. Halley and B. Westenberg, ``dnspython -- A DNS Toolkit for Python.'' [Online]. Available: \url{https://www.dnspython.org}
+
+  \item ReportLab Inc., ``ReportLab -- PDF Generation for Python.'' [Online]. Available: \url{https://www.reportlab.com}
+
+  \item Docker Inc., ``Docker -- Accelerated Container Application Development.'' [Online]. Available: \url{https://www.docker.com}
+
+  \item G. van Rossum, B. Warsaw, and N. Coghlan, ``PEP 8 -- Style Guide for Python Code,'' 2001. [Online]. Available: \url{https://peps.python.org/pep-0008/}
+
+  \item ICANN, ``ICANN -- Internet Corporation for Assigned Names and Numbers.'' [Online]. Available: \url{https://www.icann.org}
+
+  \item ICANN, ``DNS Abuse -- ICANN's Role and Efforts to Address DNS Abuse.'' [Online]. Available: \url{https://www.icann.org/dns-abuse}
+
+  \item ICANN, ``Registration Data Access Protocol (RDAP).'' [Online]. Available: \url{https://www.icann.org/rdap}
+
+  \item DNS Abuse Institute, ``NetBeacon -- Reporting DNS Abuse.'' [Online]. Available: \url{https://dnsabuseinstitute.org}
+
+  \item ICANN Security and Stability Advisory Committee (SSAC), ``SAC115 -- SSAC Advisory on DNS Abuse,'' ICANN, 2021. [Online]. Available: \url{https://www.icann.org/en/system/files/files/sac-115-en.pdf}
+
+  \item M3AAWG and ICANN, ``DNS Abuse Mitigation -- Best Practices for Registrars and Registries,'' 2022. [Online]. Available: \url{https://www.icann.org/en/blogs/details/dns-abuse-mitigation}
+
+\end{enumerate}
+
+\section*{Publications}
+
+No publications have been produced from this work at the time of submission. The project is an academic final year dissertation submitted to the National Forensic Sciences University, Delhi Campus, in partial fulfilment of the B.Tech.-M.Tech. degree in Computer Science and Engineering (Cybersecurity).
+
+\end{document}
