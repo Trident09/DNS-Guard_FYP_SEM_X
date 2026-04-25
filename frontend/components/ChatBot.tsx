@@ -56,7 +56,7 @@ export default function ChatBot({ domain }: { domain: string }) {
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
-              className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+              className={`max-w-xs px-3 py-2 rounded-lg text-sm whitespace-pre-wrap ${
                 m.role === "user" ? "bg-blue-600" : "bg-gray-700"
               }`}
             >
