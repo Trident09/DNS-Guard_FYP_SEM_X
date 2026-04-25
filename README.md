@@ -21,7 +21,7 @@
 | **IP Geolocation Map** | SVG world map with hover tooltips |
 | **Feature Importance Chart** | SHAP-style bar chart from ML model |
 | **Risk Summary** | Actionable recommendations per scan |
-| **AI Chatbot** | Context-aware DNS security assistant (Ollama/fallback) |
+| **AI Chatbot** | Context-aware DNS security assistant (Groq API + fallback) |
 | **PDF Report** | Comprehensive downloadable report |
 | **Dark / Light Mode** | Persistent theme toggle |
 | **Recent Searches** | localStorage history on home page |
@@ -45,7 +45,7 @@
 
 - **Frontend** — Next.js 14 App Router, Tailwind CSS, Recharts, Lucide icons
 - **Backend** — FastAPI, Celery workers, ReportLab PDF generation
-- **AI Service** — FastAPI, scikit-learn ensemble model, Ollama (optional LLM)
+- **AI Service** — FastAPI, scikit-learn ensemble model, Groq API (LLaMA 3.1)
 - **PostgreSQL** — persistent storage
 - **Redis** — Celery task queue / broker
 - **Qdrant** — vector database for RAG (chatbot knowledge base)
@@ -56,7 +56,7 @@
 
 ### Prerequisites
 - Docker & Docker Compose
-- (Optional) [Ollama](https://ollama.ai) running locally for LLM chatbot
+- (Optional) [Groq API key](https://console.groq.com) for AI chatbot (free tier)
 
 ### 1. Clone & configure
 
@@ -98,8 +98,8 @@ See `.env.example` for all variables. Key ones:
 | `POSTGRES_DB` | `dnsabuse_db` | Database name |
 | `REDIS_URL` | `redis://redis:6379/0` | Redis connection |
 | `AI_SERVICE_URL` | `http://ai:8001` | Internal AI service URL |
-| `OLLAMA_BASE_URL` | `http://host.docker.internal:11434` | Ollama LLM endpoint |
-| `OLLAMA_MODEL` | `mistral` | Ollama model name |
+| `GROQ_API_KEY` | _(empty)_ | Groq API key — get free at console.groq.com |
+| `LLM_MODEL` | `llama-3.1-8b-instant` | Groq model name |
 | `VIRUSTOTAL_API_KEY` | _(empty)_ | Optional — enhances threat intel |
 | `SHODAN_API_KEY` | _(empty)_ | Optional — enhances reverse IP |
 | `SECRET_KEY` | `changeme` | **Change in production** |
@@ -156,7 +156,7 @@ FYP/
 │   └── app/
 │       ├── api/
 │       │   ├── score.py                # Threat scoring endpoint
-│       │   └── chat.py                 # Chatbot endpoint (Ollama + fallback)
+│       │   └── chat.py                 # Chatbot endpoint (Groq API + fallback)
 │       ├── features/extractor.py       # 40-feature vector extraction
 │       └── models/
 │           ├── ensemble.py             # Ensemble model (RF + rules)
@@ -210,7 +210,7 @@ The ensemble combines rule-based scoring with an MLP neural network. Feature imp
 
 ## Chatbot
 
-The AI assistant uses **Ollama** (local LLM, default: `mistral`) when available. If Ollama is not running, it falls back to a keyword-based rule engine covering:
+The AI assistant uses the **Groq API** (LLaMA 3.1 8B Instant) when a `GROQ_API_KEY` is configured. Without a key, it falls back to a comprehensive rule-based engine covering:
 
 - DNSSEC configuration
 - SPF / DKIM / DMARC email security

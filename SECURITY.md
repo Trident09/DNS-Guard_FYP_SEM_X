@@ -34,6 +34,6 @@ This project is **not hardened for production use**. Known areas that require at
 - No rate limiting on the `/analyze` endpoint
 - No authentication or authorisation layer
 - External API calls (ip-api.com, crt.sh, etc.) are made without caching in all cases
-- The Ollama LLM integration is unauthenticated
+- The Groq API key should be kept secret and not committed to version control
 
 See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the production checklist.

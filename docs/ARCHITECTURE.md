@@ -80,7 +80,7 @@ User message
      ▼
 Backend /chat → AI Service /chat
      │
-     ├── Try Ollama (local LLM, e.g. mistral)
+     ├── Try Groq API (LLaMA 3.1 8B Instant)
      │     └── Builds prompt with domain context + conversation history
      │
      └── Fallback: keyword-based rule engine

@@ -67,16 +67,15 @@ uvicorn app.main:app --reload --port 8001
 
 ---
 
-## Optional: Ollama (LLM Chatbot)
+## Optional: Groq API (AI Chatbot)
 
-Install [Ollama](https://ollama.ai) and pull the model:
+Sign up at [console.groq.com](https://console.groq.com) and create a free API key, then add it to `.env`:
 
 ```bash
-ollama pull mistral
-ollama serve      # runs on http://localhost:11434
+GROQ_API_KEY=gsk_your_key_here
 ```
 
-The AI service will automatically use Ollama when available. Without it, the chatbot falls back to a keyword-based rule engine.
+The AI service will use Groq when `GROQ_API_KEY` is set. Without it, the chatbot falls back to a built-in rule-based engine.
 
 ---
 
