@@ -10,7 +10,16 @@ interface PassiveDnsData {
 }
 
 export default function PassiveDnsCard({ data }: { data: PassiveDnsData }) {
-  if (!data || data.error) return null;
+  if (!data || data.error) {
+    return (
+      <div className="bg-gray-800 rounded-xl p-5">
+        <h2 className="text-lg font-semibold mb-4">Passive DNS</h2>
+        <p className="text-sm text-gray-400">
+          {data?.error ? `Error: ${data.error}` : "No passive DNS data available"}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-800 rounded-xl p-5">

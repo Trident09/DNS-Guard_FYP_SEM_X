@@ -7,7 +7,14 @@ interface ThreatIntelData {
 }
 
 export default function ThreatIntelCard({ data }: { data: ThreatIntelData }) {
-  if (!data) return null;
+  if (!data) {
+    return (
+      <div className="bg-gray-800 rounded-xl p-5">
+        <h2 className="text-lg font-semibold mb-4">Threat Intelligence</h2>
+        <p className="text-sm text-gray-400">No threat intelligence data available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-800 rounded-xl p-5">

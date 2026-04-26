@@ -9,7 +9,14 @@ interface SubdomainData {
 }
 
 export default function SubdomainCard({ data }: { data: SubdomainData }) {
-  if (!data) return null;
+  if (!data) {
+    return (
+      <div className="bg-gray-800 rounded-xl p-5">
+        <h2 className="text-lg font-semibold mb-4">Subdomains</h2>
+        <p className="text-sm text-gray-400">No subdomain data available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-800 rounded-xl p-5">

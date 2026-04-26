@@ -12,7 +12,14 @@ interface WhoisData {
 }
 
 export default function WhoisCard({ data }: { data: WhoisData }) {
-  if (data?.error) return null;
+  if (data?.error) {
+    return (
+      <div className="bg-gray-800 rounded-xl p-5">
+        <h2 className="text-lg font-semibold mb-4">WHOIS</h2>
+        <p className="text-sm text-gray-400">Error: {data.error}</p>
+      </div>
+    );
+  }
 
   const fmt = (iso?: string) =>
     iso ? new Date(iso).toLocaleDateString() : "—";

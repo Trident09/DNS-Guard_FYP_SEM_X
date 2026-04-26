@@ -16,7 +16,16 @@ interface TyposquatData {
 }
 
 export default function TyposquatCard({ data }: { data: TyposquatData }) {
-  if (!data || data.error) return null;
+  if (!data || data.error) {
+    return (
+      <div className="bg-gray-800 rounded-xl p-5">
+        <h2 className="text-lg font-semibold mb-4">Typosquat Detection</h2>
+        <p className="text-sm text-gray-400">
+          {data?.error ? `Error: ${data.error}` : "No typosquat data available"}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-800 rounded-xl p-5">
