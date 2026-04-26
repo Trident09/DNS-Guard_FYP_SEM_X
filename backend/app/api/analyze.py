@@ -62,6 +62,7 @@ async def analyze(req: AnalyzeRequest):
         "threat_score": ai_result["score"],
         "verdict": ai_result["verdict"],
         "explanations": ai_result["explanations"],
+        "feature_importance": ai_result.get("feature_importance", []),
     }
 
 

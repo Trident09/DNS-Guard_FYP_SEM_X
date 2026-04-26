@@ -11,9 +11,30 @@ async def get_certs(domain: str) -> dict:
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             res = await client.get(url, headers={"Accept": "application/json"})
+        
+        # Check if response is HTML (error page)
+        if res.status_code != 200 or res.text.strip().startswith("<"):
+            return {
+                "error": f"crt.sh service unavailable (HTTP {res.status_code})",
+                "total_certs": 0,
+                "wildcard_certs": 0,
+                "certs_last_30d": 0,
+                "cert_spike": False,
+                "has_wildcards": False,
+                "recent_certs": [],
+            }
+        
         certs = res.json()
     except Exception as e:
-        return {"error": str(e), "certs": [], "summary": {}}
+        return {
+            "error": f"crt.sh service error: {str(e)}",
+            "total_certs": 0,
+            "wildcard_certs": 0,
+            "certs_last_30d": 0,
+            "cert_spike": False,
+            "has_wildcards": False,
+            "recent_certs": [],
+        }
 
     seen_ids: set = set()
     unique: list[dict] = []

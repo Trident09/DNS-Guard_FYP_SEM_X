@@ -2,91 +2,116 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Design tokens ─────────────────────────────────────── */
-:root {
-  --bg-page:    #f1f5f9;
-  --bg-card:    #ffffff;
-  --bg-input:   #f8fafc;
-  --bg-hover:   #f1f5f9;
-  --text-base:  #0f172a;
-  --text-muted: #64748b;
-  --text-faint: #94a3b8;
-  --border:     #e2e8f0;
-  --shadow:     0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-}
-
-.dark {
-  --bg-page:    #030712;
-  --bg-card:    #111827;
-  --bg-input:   #1f2937;
-  --bg-hover:   #1f2937;
-  --text-base:  #f9fafb;
-  --text-muted: #9ca3af;
-  --text-faint: #6b7280;
-  --border:     #1f2937;
-  --shadow:     none;
-}
-
 /* ── Base ──────────────────────────────────────────────── */
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-
 body {
-  background: var(--bg-page);
-  color: var(--text-base);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Map Tailwind classes to tokens ────────────────────── */
-@layer base {
-  /* Page background */
-  .bg-gray-950 { background-color: var(--bg-page) !important; }
+/* ── Dark mode (default) — no overrides needed, Tailwind classes work as-is ── */
 
-  /* Card background + border + shadow in light mode */
-  .bg-gray-800 {
-    background-color: var(--bg-card) !important;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-  }
-
-  /* Input / secondary surface */
-  .bg-gray-700 { background-color: var(--bg-input) !important; }
-
-  /* Hover states */
-  .hover\:bg-gray-700:hover { background-color: var(--bg-hover) !important; }
+/* ── Light mode overrides ──────────────────────────────── */
+/* Only applied when .dark is NOT on <html> */
+html:not(.dark) {
+  /* Page backgrounds */
+  --lm-page:   #f1f5f9;
+  --lm-card:   #ffffff;
+  --lm-card2:  #f8fafc;   /* slightly off-white for nested surfaces */
+  --lm-input:  #f1f5f9;
+  --lm-hover:  #e2e8f0;
+  --lm-border: #e2e8f0;
+  --lm-shadow: 0 1px 4px rgba(0,0,0,0.08);
 
   /* Text */
-  .text-white   { color: var(--text-base)  !important; }
-  .text-gray-400 { color: var(--text-muted) !important; }
-  .text-gray-500 { color: var(--text-faint) !important; }
-  .text-gray-300 { color: var(--text-muted) !important; }
+  --lm-text:       #0f172a;
+  --lm-text-muted: #475569;
+  --lm-text-faint: #94a3b8;
+}
 
-  /* Borders */
-  .border-gray-700 { border-color: var(--border) !important; }
-  .border-gray-600 { border-color: var(--border) !important; }
+/* Page root */
+html:not(.dark) body {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
 
-  /* Input focus ring */
-  input, textarea {
-    background-color: var(--bg-input);
-    color: var(--text-base);
-    border-color: var(--border);
-  }
-  input:focus, textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-  }
+/* ── Surface remapping ─────────────────────────────────── */
+html:not(.dark) .bg-gray-950 { background-color: var(--lm-page) !important; }
+html:not(.dark) .bg-gray-900 { background-color: var(--lm-card2) !important; }
+html:not(.dark) .bg-gray-800 { background-color: var(--lm-card) !important; }
+html:not(.dark) .bg-gray-700 { background-color: var(--lm-input) !important; }
 
-  /* Placeholder */
-  input::placeholder { color: var(--text-faint); }
+/* Hover surfaces */
+html:not(.dark) .hover\:bg-gray-700:hover { background-color: var(--lm-hover) !important; }
+html:not(.dark) .hover\:bg-gray-800:hover { background-color: var(--lm-hover) !important; }
+
+/* Navbar / backdrop */
+html:not(.dark) .bg-gray-950\/80 { background-color: rgba(241,245,249,0.85) !important; }
+
+/* Semi-transparent card variants */
+html:not(.dark) .bg-gray-900\/30 { background-color: rgba(248,250,252,0.8) !important; }
+html:not(.dark) .bg-gray-800\/50 { background-color: rgba(255,255,255,0.7) !important; }
+html:not(.dark) .bg-gray-800\/80 { background-color: rgba(255,255,255,0.9) !important; }
+
+/* ── Border remapping ──────────────────────────────────── */
+html:not(.dark) .border-gray-800    { border-color: var(--lm-border) !important; }
+html:not(.dark) .border-gray-800\/50 { border-color: rgba(226,232,240,0.7) !important; }
+html:not(.dark) .border-gray-700    { border-color: var(--lm-border) !important; }
+
+/* ── Text remapping ────────────────────────────────────── */
+/* Only remap neutral grays — never touch text-white on its own
+   because it's used inside colored buttons/badges */
+html:not(.dark) .text-gray-400 { color: var(--lm-text-muted) !important; }
+html:not(.dark) .text-gray-500 { color: var(--lm-text-faint) !important; }
+html:not(.dark) .text-gray-600 { color: var(--lm-text-faint) !important; }
+html:not(.dark) .text-gray-300 { color: var(--lm-text-muted) !important; }
+
+/* Body text: remap text-white ONLY when it's a direct child of a light surface,
+   not inside a colored button/badge. We do this by targeting the page wrapper. */
+html:not(.dark) .min-h-screen.bg-gray-950 { color: var(--lm-text) !important; }
+
+/* Headings and labels that use text-white explicitly */
+html:not(.dark) h1.text-white,
+html:not(.dark) h2.text-white,
+html:not(.dark) h3.text-white,
+html:not(.dark) h4.text-white,
+html:not(.dark) p.text-white,
+html:not(.dark) span.text-white:not([class*="bg-"]),
+html:not(.dark) .font-semibold.text-white,
+html:not(.dark) .font-bold.text-white,
+html:not(.dark) .font-medium.text-white {
+  color: var(--lm-text) !important;
+}
+
+/* ── Input fields ──────────────────────────────────────── */
+html:not(.dark) input,
+html:not(.dark) textarea {
+  background-color: var(--lm-card) !important;
+  color: var(--lm-text) !important;
+  border-color: var(--lm-border) !important;
+}
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+  color: var(--lm-text-faint) !important;
+}
+html:not(.dark) input:focus,
+html:not(.dark) textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important;
+}
+
+/* ── Card shadow in light mode ─────────────────────────── */
+html:not(.dark) .bg-gray-800,
+html:not(.dark) .bg-gray-900 {
+  box-shadow: var(--lm-shadow);
 }
 
 /* ── Scrollbar ─────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+html.dark ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+html:not(.dark) ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 
 /* ── Selection ─────────────────────────────────────────── */
 ::selection { background: #3b82f6; color: #fff; }
