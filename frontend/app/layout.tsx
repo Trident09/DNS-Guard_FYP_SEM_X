@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import ThemeToggle from "@/components/ThemeToggle";
+import ScrollToTop from "@/components/ScrollToTop";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -72,9 +74,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ThemeToggle />
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-950 text-white`}>
+        <ScrollToTop />
+        <Navbar />
+        <main className="pt-16">{children}</main>
+        <Footer />
       </body>
     </html>
   );
