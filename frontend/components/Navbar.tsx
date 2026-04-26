@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, BookOpen } from "lucide-react";
+import { Shield, BookOpen, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
@@ -12,13 +12,20 @@ export default function Navbar() {
         <Shield className="w-5 h-5 text-blue-400" />
         <span className="font-bold tracking-tight">DNS Guard</span>
       </div>
-      <div className="flex justify-center w-1/3">
+      <div className="flex justify-center w-1/3 gap-2">
         <button
           onClick={() => router.push("/docs")}
           className="flex items-center gap-2 px-4 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors border border-gray-700"
         >
           <BookOpen className="w-4 h-4" />
           Documentation
+        </button>
+        <button
+          onClick={() => router.push("/dnssec-tutorial")}
+          className="flex items-center gap-2 px-4 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors border border-gray-700"
+        >
+          <Lock className="w-4 h-4" />
+          DNSSEC Tutorial
         </button>
       </div>
       <div className="flex justify-end w-1/3" />
