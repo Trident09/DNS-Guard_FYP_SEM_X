@@ -1,8 +1,8 @@
 "use client";
 
-import { Download, Copy, Share2, Check } from "lucide-react";
+import { Download, Copy, Share2, Check, ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import ThreatScoreCard from "@/components/ThreatScoreCard";
 import DnsRecordsTable from "@/components/DnsRecordsTable";
@@ -84,6 +84,7 @@ interface Report {
 }
 
 export default function AnalyzePage() {
+  const router = useRouter();
   const { domain } = useParams<{ domain: string }>();
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(true);
@@ -137,6 +138,14 @@ export default function AnalyzePage() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-3 flex-wrap">
+          <button
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors"
+            title="Back to home"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Back</span>
+          </button>
           <h1 className="text-2xl font-bold">
             Report: <span className="text-blue-400">{decodedDomain}</span>
           </h1>
